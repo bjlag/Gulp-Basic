@@ -14,17 +14,17 @@ bower i
 
 ## Структура проекта
 
-dist  
-    |_ css  
-    |_ fonts  
-    |_ images  
-    |_ js  
-src  
-    |_ assets  
-        |_ css  
-        |_ fonts  
-        |_ images  
-        |_ js  
-    |_ lib  
-    |_ sass  
-    *.html  
+* dist  
+    * css  
+    * fonts  
+    * images  
+    * js  
+* src  
+    * assets  
+        * css  
+        * fonts  
+        * images  
+        * js  
+    * lib  
+    * sass  
+    * *.html  
