@@ -8,7 +8,7 @@ const wiredep = require( 'wiredep' ).stream;
 const useref = require( 'gulp-useref' );
 const autoprefixer = require( 'gulp-autoprefixer' );
 const sourcemaps = require( 'gulp-sourcemaps' );
-const browserSync = require( 'browser-sync' ).create();
+const bs = require( 'browser-sync' ).create();
 const watch = require( 'gulp-watch' );
 const gulpif = require( 'gulp-if' );
 const uglify = require( 'gulp-uglify' );
@@ -25,17 +25,18 @@ const path = {
         root: './src',
         html: './src/*.html',
         sass: './src/sass/**/*.+(sass|scss)',
-        css: './src/assets/css',
+        css: './src/css',
         assets: './src/assets/**/*'
     },
     build: [
-        './src/assets/fonts/**/*',
-        './src/assets/images/**/*',
+        './src/fonts/**/*',
+        './src/images/**/*',
         // './src/assets/css/**/*.css',
         './src/*.html'
     ],
     watch: [
-        './src/**/*',
+        './src/сss/*.css',
+        './src/*.html',
         '!./src/lib/**/*'
     ]
 };
@@ -62,17 +63,18 @@ gulp.task( 'css', () => {
         .pipe( sass( { outputStyle: 'extended' } ) ).on( 'error', sass.logError )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
         .pipe( sourcemaps.write( '/' ) )
-        .pipe( gulp.dest( path.src.css ) );
+        .pipe( gulp.dest( path.src.css ) )
+        .pipe( bs.stream() );
 } );
 
 gulp.task( 'browser-sync', function () {
-    browserSync.init( {
+    bs.init( {
         server: {
             baseDir: path.src.root
         },
         notify: false
     } );
-    browserSync.watch( path.watch ).on( 'change', browserSync.reload );
+    watch( path.watch, bs.reload );
 } );
 
 gulp.task( 'watch', () => {
