@@ -20,11 +20,10 @@ bower i
     * images  
     * js  
 * src  
-    * assets  
-        * css  
-        * fonts  
-        * images  
-        * js  
+    * css  
+    * fonts  
+    * images  
+    * js  
     * lib  
     * sass  
     * *.html  
