@@ -26,4 +26,8 @@ bower i
     * js  
     * lib  
     * sass  
-    * *.html  
+    * *.html
+* .bowerrc
+* bower.json
+* gulpfile.js
+* package.json
