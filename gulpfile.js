@@ -90,4 +90,6 @@ gulp.task( 'build', [ 'clean' ], () => {
         .pipe( gulp.dest( path.dist.root ) )
 } );
 
-gulp.task( 'dev', [ 'css', 'bower', 'watch', 'browser-sync' ] );
+gulp.task( 'dev', () => {
+    runSequence( [ 'css', 'bower' ], 'watch', 'browser-sync' );
+} );
