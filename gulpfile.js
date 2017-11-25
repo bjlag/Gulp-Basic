@@ -60,7 +60,7 @@ gulp.task( 'bower', () => {
 gulp.task( 'css', () => {
     return gulp.src( path.src.sass )
         .pipe( sourcemaps.init() )
-        .pipe( sass( { outputStyle: 'extended' } ) ).on( 'error', sass.logError )
+        .pipe( sass( { outputStyle: 'expanded' } ) ).on( 'error', sass.logError )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
         .pipe( sourcemaps.write( '/' ) )
         .pipe( gulp.dest( path.src.css ) )
