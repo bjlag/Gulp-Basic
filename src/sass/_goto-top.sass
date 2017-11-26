@@ -1,0 +1,30 @@
+.goto-top
+    position: fixed
+    bottom: 53px
+    right: -50px
+    transition: transform ease-out .5s
+
+    &--show
+        transform: translateX( -70px )
+
+    &__btn
+        display: block
+        width: 50px
+        height: 50px
+        background: #f5a44c
+        border-radius: 50%
+        text-align: center
+        line-height: 50px
+        color: #fff
+        box-shadow: 0 0 10px rgba( 0, 0, 0, 0.15 )
+        transition: background ease-out 0.3s, color ease 0.3s
+
+        &:hover
+            background: darken( #f5a44c, 20% )
+            color: #fff
+
+        &:focus
+            color: #fff
+
+        &:active
+            background: lighten( #f5a44c, 20% )
