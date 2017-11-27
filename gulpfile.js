@@ -12,7 +12,7 @@ const bs = require( 'browser-sync' ).create();
 const watch = require( 'gulp-watch' );
 const gulpif = require( 'gulp-if' );
 const uglify = require( 'gulp-uglify' );
-const miniCss = require( 'gulp-csso' );
+const minifyCss = require( 'gulp-clean-css' );
 const imagemin = require('gulp-imagemin');
 const imageminJpeg = require('imagemin-jpeg-recompress');
 const imageminPng = require('imagemin-pngquant');
@@ -140,14 +140,27 @@ gulp.task( 'build:mini', () => {
     return gulp.src( path.src.html )
         .pipe( useref() )
         .pipe( gulpif( '*.js', uglify() ) )
-        .pipe( gulpif( '*.css', miniCss( { comments: false } ) ) )
+        .pipe( gulpif( '*.css', minifyCss(
+            {
+                compatibility: 'ie9',
+                level: {
+                    1: {
+                        specialComments: false // удаляем все комментарии
+                    }
+                }
+            },
+            ( details ) => {
+                console.log( `${ details.name }: ${ details.stats.originalSize }` );
+                console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
+            } )
+        ) )
         .pipe( gulp.dest( path.dist.root ) );
 } );
 
 gulp.task( 'build', () => {
     runSequence(
         'clean:dist',
-        [ 'build:fonts', 'build:mini', 'build:other' ],
+        [ 'build:fonts', 'build:mini', 'build:php' ],
         'build:images'
     );
 } );
