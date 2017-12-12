@@ -16,7 +16,8 @@ const minifyCss = require( 'gulp-clean-css' );
 const imagemin = require( 'gulp-imagemin' );
 const imageminJpeg = require( 'imagemin-jpeg-recompress' );
 const imageminPng = require( 'imagemin-pngquant' );
-const favicons = require( "gulp-favicons" );
+const favicons = require( 'gulp-favicons' );
+const fileinclude = require('gulp-file-include');
 const runSequence = require( 'run-sequence' );
 const cache = require( 'gulp-cache' );
 
@@ -94,7 +95,7 @@ gulp.task( 'favicons:clean-dist', () => {
     return del( path.src.favicons );
 } );
 
-gulp.task( 'favicons:generate', [ 'favicons:clean-src' ], () => {
+gulp.task( 'favicons:generate-icons', [ 'favicons:clean-src' ], () => {
     return gulp.src( path.favicons.masterPicture )
         .pipe( favicons( {
             appName: null,                  // Your application's name. `string`
@@ -140,7 +141,7 @@ gulp.task( 'favicons:generate', [ 'favicons:clean-src' ], () => {
         .pipe( gulp.dest( path.favicons.dist ) );
 } );
 
-gulp.task( 'favicons:move', [ 'favicons:clean-dist' ], () => {
+gulp.task( 'favicons:move-icons', [ 'favicons:clean-dist' ], () => {
     return gulp.src( path.favicons.dist + '/*.+(ico|png|svg|xml)' )
         .pipe( gulp.dest( path.src.favicons ) );
 } );
@@ -221,14 +222,17 @@ gulp.task( 'build:mini', () => {
                 console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
             } )
         ) )
+        .pipe( fileinclude() )
         .pipe( gulp.dest( path.dist.root ) );
 } );
 
 gulp.task( 'build', () => {
     runSequence(
         'clean:dist',
-        [ 'build:fonts', 'build:mini', 'build:php' ],
-        'build:images'
+        'favicons:generate-icons',
+        'favicons:move-icons',
+        'build:images',
+        [ 'build:fonts', 'build:mini', 'build:php' ]
     );
 } );
 
