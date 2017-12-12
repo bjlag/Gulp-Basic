@@ -1,3 +1,4 @@
 .idea
 src/lib
 node_modules
+dist
