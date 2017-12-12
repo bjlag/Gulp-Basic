@@ -13,11 +13,13 @@ const watch = require( 'gulp-watch' );
 const gulpif = require( 'gulp-if' );
 const uglify = require( 'gulp-uglify' );
 const minifyCss = require( 'gulp-clean-css' );
-const imagemin = require('gulp-imagemin');
-const imageminJpeg = require('imagemin-jpeg-recompress');
-const imageminPng = require('imagemin-pngquant');
+const imagemin = require( 'gulp-imagemin' );
+const imageminJpeg = require( 'imagemin-jpeg-recompress' );
+const imageminPng = require( 'imagemin-pngquant' );
+const favicon = require( 'gulp-real-favicon' );
+const fs = require( 'fs' );
 const runSequence = require( 'run-sequence' );
-const cache = require('gulp-cache');
+const cache = require( 'gulp-cache' );
 
 // НАСТРОЙКИ
 const path = {
@@ -36,7 +38,12 @@ const path = {
             './src/fonts/**/*',
             './src/lib/bootstrap/fonts/**/*'
         ],
-        images: './src/images/**/*'
+        images: './src/images/**/*',
+        favicon: {
+            dataFile: 'faviconData.json',
+            masterPicture: './src/images/favicon-master.png',
+            dist: './src/images/'
+        }
     },
     php: [
         // './src/include/**/*'
@@ -78,6 +85,94 @@ gulp.task( 'css', () => {
         .pipe( bs.stream() );
 } );
 
+// Generate the icons. This task takes a few seconds to complete.
+// You should run it at least once to create the icons. Then,
+// you should run it whenever RealFaviconGenerator updates its
+// package (see the check-for-favicon-update task below).
+gulp.task( 'favicon', function ( done ) {
+    favicon.generateFavicon( {
+        masterPicture: path.src.favicon.masterPicture,
+        dest: path.src.favicon.dist,
+        iconsPath: '/',
+        design: {
+            ios: {
+                pictureAspect: 'backgroundAndMargin',
+                backgroundColor: '#ffffff',
+                margin: '14%',
+                assets: {
+                    ios6AndPriorIcons: false,
+                    ios7AndLaterIcons: false,
+                    precomposedIcons: false,
+                    declareOnlyDefaultIcon: true
+                }
+            },
+            desktopBrowser: {},
+            windows: {
+                pictureAspect: 'noChange',
+                backgroundColor: '#da532c',
+                onConflict: 'override',
+                assets: {
+                    windows80Ie10Tile: false,
+                    windows10Ie11EdgeTiles: {
+                        small: false,
+                        medium: true,
+                        big: false,
+                        rectangle: false
+                    }
+                }
+            },
+            androidChrome: {
+                pictureAspect: 'noChange',
+                themeColor: '#ffffff',
+                manifest: {
+                    startUrl: '',
+                    display: 'standalone',
+                    orientation: 'notSet',
+                    onConflict: 'override',
+                    declared: true
+                },
+                assets: {
+                    legacyIcon: false,
+                    lowResolutionIcons: false
+                }
+            },
+            safariPinnedTab: {
+                pictureAspect: 'silhouette',
+                themeColor: '#5bbad5'
+            }
+        },
+        settings: {
+            scalingAlgorithm: 'Mitchell',
+            errorOnImageTooSmall: false
+        },
+        markupFile: path.src.favicon.dataFile
+    }, function () {
+        done();
+    } );
+} );
+
+// Inject the favicon markups in your HTML pages. You should run
+// this task whenever you modify a page. You can keep this task
+// as is or refactor your existing HTML pipeline.
+gulp.task( 'favicon-inject', function () {
+    return gulp.src( [ 'TODO: List of the HTML files where to inject favicon markups' ] )
+        .pipe( favicon.injectFaviconMarkups( JSON.parse( fs.readFileSync( path.src.favicon.dataFile ) ).favicon.html_code ) )
+        .pipe( gulp.dest( 'TODO: Path to the directory where to store the HTML files' ) );
+} );
+
+// Check for updates on RealFaviconGenerator (think: Apple has just
+// released a new Touch icon along with the latest version of iOS).
+// Run this task from time to time. Ideally, make it part of your
+// continuous integration system.
+gulp.task( 'favicon-update', function ( done ) {
+    const currentVersion = JSON.parse( fs.readFileSync( path.src.favicon.dataFile ) ).version;
+    favicon.checkForUpdates( currentVersion, function ( err ) {
+        if ( err ) {
+            throw err;
+        }
+    } );
+} );
+
 gulp.task( 'browser-sync', function () {
     bs.init( {
         server: {
@@ -113,7 +208,7 @@ gulp.task( 'build:images', () => {
                         loops: 5,
                         min: 75,
                         max: 80,
-                        quality:'high'
+                        quality: 'high'
                     } ),
                     imagemin.svgo(),
                     imagemin.optipng( {
