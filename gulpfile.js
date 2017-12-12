@@ -1,6 +1,9 @@
 'use strict';
 
-// БИБЛИОТЕКИ
+//-----------------------------------------------------
+// Libraries
+//-----------------------------------------------------
+
 const gulp = require( 'gulp' );
 const del = require( 'del' );
 const sass = require( 'gulp-sass' );
@@ -21,7 +24,11 @@ const fileinclude = require('gulp-file-include');
 const runSequence = require( 'run-sequence' );
 const cache = require( 'gulp-cache' );
 
-// НАСТРОЙКИ
+
+//-----------------------------------------------------
+// Setting
+//-----------------------------------------------------
+
 const path = {
     dist: {
         root: './dist',
@@ -55,7 +62,15 @@ const path = {
     ]
 };
 
-// ЗАДАЧИ
+
+//-----------------------------------------------------
+// Tasks
+//-----------------------------------------------------
+
+/**
+ * Dev tasks
+ */
+
 gulp.task( 'clean:dist', () => {
     return del( path.dist.root );
 } );
@@ -85,7 +100,9 @@ gulp.task( 'css', () => {
         .pipe( bs.stream() );
 } );
 
-// Favicons
+/**
+ * Favicons
+ */
 
 gulp.task( 'favicons:clean-src', () => {
     return del( path.favicons.dist );
@@ -146,20 +163,9 @@ gulp.task( 'favicons:move-icons', [ 'favicons:clean-dist' ], () => {
         .pipe( gulp.dest( path.src.favicons ) );
 } );
 
-gulp.task( 'browser-sync', () => {
-    bs.init( {
-        server: {
-            baseDir: path.src.root
-        },
-        notify: false
-    } );
-    watch( path.watch, bs.reload );
-} );
-
-gulp.task( 'watch', () => {
-    watch( path.src.sass, () => gulp.start( 'css' ) );
-    watch( './bower.json', () => gulp.start( 'bower' ) );
-} );
+/**
+ * Build tasks
+ */
 
 gulp.task( 'build:fonts', () => {
     return gulp.src( path.src.fonts )
@@ -225,6 +231,29 @@ gulp.task( 'build:mini', () => {
         .pipe( fileinclude() )
         .pipe( gulp.dest( path.dist.root ) );
 } );
+
+/**
+ * Other tasks
+ */
+
+gulp.task( 'browser-sync', () => {
+    bs.init( {
+        server: {
+            baseDir: path.src.root
+        },
+        notify: false
+    } );
+    watch( path.watch, bs.reload );
+} );
+
+gulp.task( 'watch', () => {
+    watch( path.src.sass, () => gulp.start( 'css' ) );
+    watch( './bower.json', () => gulp.start( 'bower' ) );
+} );
+
+/**
+ * Main tasks
+ */
 
 gulp.task( 'build', () => {
     runSequence(
