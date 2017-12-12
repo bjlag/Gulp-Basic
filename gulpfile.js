@@ -16,8 +16,7 @@ const minifyCss = require( 'gulp-clean-css' );
 const imagemin = require( 'gulp-imagemin' );
 const imageminJpeg = require( 'imagemin-jpeg-recompress' );
 const imageminPng = require( 'imagemin-pngquant' );
-const favicon = require( 'gulp-real-favicon' );
-const fs = require( 'fs' );
+const favicons = require( "gulp-favicons" );
 const runSequence = require( 'run-sequence' );
 const cache = require( 'gulp-cache' );
 
@@ -39,15 +38,15 @@ const path = {
             './src/lib/bootstrap/fonts/**/*'
         ],
         images: './src/images/**/*',
-        favicon: {
-            dataFile: 'faviconData.json',
-            masterPicture: './src/images/favicon-master.png',
-            dist: './src/images/'
-        }
+        favicons: './src/images/favicons'
     },
     php: [
         // './src/include/**/*'
     ],
+    favicons: {
+        masterPicture: './src/favicons/favicon-master.png',
+        dist: './src/favicons/icons'
+    },
     watch: [
         './src/сss/*.css',
         './src/*.html',
@@ -85,95 +84,68 @@ gulp.task( 'css', () => {
         .pipe( bs.stream() );
 } );
 
-// Generate the icons. This task takes a few seconds to complete.
-// You should run it at least once to create the icons. Then,
-// you should run it whenever RealFaviconGenerator updates its
-// package (see the check-for-favicon-update task below).
-gulp.task( 'favicon', function ( done ) {
-    favicon.generateFavicon( {
-        masterPicture: path.src.favicon.masterPicture,
-        dest: path.src.favicon.dist,
-        iconsPath: '/',
-        design: {
-            ios: {
-                pictureAspect: 'backgroundAndMargin',
-                backgroundColor: '#ffffff',
-                margin: '14%',
-                assets: {
-                    ios6AndPriorIcons: false,
-                    ios7AndLaterIcons: false,
-                    precomposedIcons: false,
-                    declareOnlyDefaultIcon: true
-                }
-            },
-            desktopBrowser: {},
-            windows: {
-                pictureAspect: 'noChange',
-                backgroundColor: '#da532c',
-                onConflict: 'override',
-                assets: {
-                    windows80Ie10Tile: false,
-                    windows10Ie11EdgeTiles: {
-                        small: false,
-                        medium: true,
-                        big: false,
-                        rectangle: false
-                    }
-                }
-            },
-            androidChrome: {
-                pictureAspect: 'noChange',
-                themeColor: '#ffffff',
-                manifest: {
-                    startUrl: '',
-                    display: 'standalone',
-                    orientation: 'notSet',
-                    onConflict: 'override',
-                    declared: true
-                },
-                assets: {
-                    legacyIcon: false,
-                    lowResolutionIcons: false
-                }
-            },
-            safariPinnedTab: {
-                pictureAspect: 'silhouette',
-                themeColor: '#5bbad5'
+// Favicons
+
+gulp.task( 'favicons:clean-src', () => {
+    return del( path.favicons.dist );
+} );
+
+gulp.task( 'favicons:clean-dist', () => {
+    return del( path.src.favicons );
+} );
+
+gulp.task( 'favicons:generate', [ 'favicons:clean-src' ], () => {
+    return gulp.src( path.favicons.masterPicture )
+        .pipe( favicons( {
+            appName: null,                  // Your application's name. `string`
+            appDescription: null,           // Your application's description. `string`
+            developerName: null,            // Your (or your developer's) name. `string`
+            developerURL: null,             // Your (or your developer's) URL. `string`
+            background: '#fff',             // Background colour for flattened icons. `string`
+            theme_color: '#fff',            // Theme color for browser chrome. `string`
+            path: "images/favicons",       // Path for overriding default icons path. `string`
+            display: "standalone",          // Android display: "browser" or "standalone". `string`
+            orientation: "portrait",        // Android orientation: "portrait" or "landscape". `string`
+            start_url: "/?homescreen=1",    // Android start application's URL. `string`
+            version: 1.0,                   // Your application's version number. `number`
+            logging: false,                 // Print logs to console? `boolean`
+            online: false,                  // Use RealFaviconGenerator to create favicons? `boolean`
+            preferOnline: false,            // Use offline generation, if online generation has failed. `boolean`
+            html: 'inject.html',
+            pipeHTML: true,
+            replace: true,
+            icons: {
+                // Platform Options:
+                // - offset - offset in percentage
+                // - shadow - drop shadow for Android icons, available online only
+                // - background:
+                //   * false - use default
+                //   * true - force use default, e.g. set background for Android icons
+                //   * color - set background for the specified icons
+                //
+                android: false,          // Create Android homescreen icon. `boolean` or `{ offset, background, shadow }`
+                appleIcon: false,        // Create Apple touch icons. `boolean` or `{ offset, background }`
+                appleStartup: false,     // Create Apple startup images. `boolean` or `{ offset, background }`
+                coast: false,            // Create Opera Coast icon with offset 25%. `boolean` or `{ offset, background }`
+                //coast: {
+                //    offset: 25,
+                //    background: '#fff'
+                //},
+                favicons: true,         // Create regular favicons. `boolean`
+                firefox: false,          // Create Firefox OS icons. `boolean` or `{ offset, background }`
+                windows: false,          // Create Windows 8 tile icons. `boolean` or `{ background }`
+                yandex: false            // Create Yandex browser icon. `boolean` or `{ background }`
             }
-        },
-        settings: {
-            scalingAlgorithm: 'Mitchell',
-            errorOnImageTooSmall: false
-        },
-        markupFile: path.src.favicon.dataFile
-    }, function () {
-        done();
-    } );
+        } ) )
+        .pipe( gulp.dest( path.favicons.dist ) );
 } );
 
-// Inject the favicon markups in your HTML pages. You should run
-// this task whenever you modify a page. You can keep this task
-// as is or refactor your existing HTML pipeline.
-gulp.task( 'favicon-inject', function () {
-    return gulp.src( [ 'TODO: List of the HTML files where to inject favicon markups' ] )
-        .pipe( favicon.injectFaviconMarkups( JSON.parse( fs.readFileSync( path.src.favicon.dataFile ) ).favicon.html_code ) )
-        .pipe( gulp.dest( 'TODO: Path to the directory where to store the HTML files' ) );
+gulp.task( 'favicons:move', [ 'favicons:clean-dist' ], () => {
+    return gulp.src( path.favicons.dist + '/*.+(ico|png|svg|xml)' )
+        .pipe( gulp.dest( path.src.favicons ) );
 } );
 
-// Check for updates on RealFaviconGenerator (think: Apple has just
-// released a new Touch icon along with the latest version of iOS).
-// Run this task from time to time. Ideally, make it part of your
-// continuous integration system.
-gulp.task( 'favicon-update', function ( done ) {
-    const currentVersion = JSON.parse( fs.readFileSync( path.src.favicon.dataFile ) ).version;
-    favicon.checkForUpdates( currentVersion, function ( err ) {
-        if ( err ) {
-            throw err;
-        }
-    } );
-} );
-
-gulp.task( 'browser-sync', function () {
+gulp.task( 'browser-sync', () => {
     bs.init( {
         server: {
             baseDir: path.src.root
