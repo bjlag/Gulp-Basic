@@ -21,6 +21,7 @@ const imageminJpeg = require( 'imagemin-jpeg-recompress' );
 const imageminPng = require( 'imagemin-pngquant' );
 const favicons = require( 'gulp-favicons' );
 const fileinclude = require('gulp-file-include');
+const gcmq = require('gulp-group-css-media-queries');
 const runSequence = require( 'run-sequence' );
 const cache = require( 'gulp-cache' );
 
@@ -214,6 +215,7 @@ gulp.task( 'build:mini', () => {
     return gulp.src( path.src.html )
         .pipe( useref() )
         .pipe( gulpif( '*.js', uglify() ) )
+        .pipe( gulpif( '*.css', gcmq() ) )
         .pipe( gulpif( '*.css', minifyCss(
             {
                 compatibility: 'ie9',
