@@ -11,27 +11,18 @@ const gulp = require( 'gulp' ),
     autoprefixer = require( 'gulp-autoprefixer' ),
     sourcemaps = require( 'gulp-sourcemaps' ),
     minifyCss = require( 'gulp-clean-css' ),
-    fileinclude = require('gulp-file-include'),
+    fileinclude = require( 'gulp-file-include' ),
     favicons = require( 'gulp-favicons' ),
     uglify = require( 'gulp-uglify' ),
-    gcmq = require('gulp-group-css-media-queries');;
-
-const wiredep = require( 'wiredep' ).stream;
-const useref = require( 'gulp-useref' );
-
-const bs = require( 'browser-sync' ).create();
-const watch = require( 'gulp-watch' );
-const gulpif = require( 'gulp-if' );
-
-
-const imagemin = require( 'gulp-imagemin' );
-const imageminJpeg = require( 'imagemin-jpeg-recompress' );
-const imageminPng = require( 'imagemin-pngquant' );
-
-
-
-const runSequence = require( 'run-sequence' );
-const cache = require( 'gulp-cache' );
+    gcmq = require( 'gulp-group-css-media-queries' ),
+    bs = require( 'browser-sync' ).create(),
+    watch = require( 'gulp-watch' ),
+    gulpif = require( 'gulp-if' ),
+    imagemin = require( 'gulp-imagemin' ),
+    imageminJpeg = require( 'imagemin-jpeg-recompress' ),
+    imageminPng = require( 'imagemin-pngquant' ),
+    runSequence = require( 'run-sequence' ),
+    cache = require( 'gulp-cache' );
 
 
 //-----------------------------------------------------
@@ -182,6 +173,20 @@ gulp.task( 'js:libs', () => {
         .pipe( gulp.dest( './src/assets/js' ) );
 } );
 
+gulp.task( 'browser-sync', () => {
+    bs.init( {
+        server: {
+            baseDir: './src'
+        },
+        notify: false
+    } );
+
+    watch( './src/html/pages/*.html', () => gulp.start( 'html' ) );
+    watch( './src/blocks/**/*.+(sass|scss)', () => gulp.start( 'css:main' ) );
+    watch( './src/blocks/**/*.js', () => gulp.start( 'js:main' ) );
+    watch( './src/*.html', bs.reload );
+} );
+
 /**
  * Favicons
  */
@@ -280,52 +285,6 @@ gulp.task( 'images', () => {
             )
         ) )
         .pipe( gulp.dest( './dist/assets/images' ) );
-} );
-
-gulp.task( 'build:php', () => {
-    return gulp.src( path.php )
-        .pipe( gulp.dest( path.dist.root ) );
-} );
-
-gulp.task( 'build:mini', () => {
-    return gulp.src( path.src.html )
-        .pipe( useref() )
-        .pipe( gulpif( '*.js', uglify() ) )
-        .pipe( gulpif( '*.css', gcmq() ) )
-        .pipe( gulpif( '*.css', minifyCss(
-            {
-                compatibility: 'ie9',
-                level: {
-                    1: {
-                        specialComments: false // удаляем все комментарии
-                    }
-                }
-            },
-            ( details ) => {
-                console.log( `${ details.name }: ${ details.stats.originalSize }` );
-                console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
-            } )
-        ) )
-        .pipe( fileinclude() )
-        .pipe( gulp.dest( path.dist.root ) );
-} );
-
-/**
- * Other tasks
- */
-
-gulp.task( 'browser-sync', () => {
-    bs.init( {
-        server: {
-            baseDir: './src'
-        },
-        notify: false
-    } );
-
-    watch( './src/html/pages/*.html', () => gulp.start( 'html' ) );
-    watch( './src/blocks/**/*.+(sass|scss)', () => gulp.start( 'css:main' ) );
-    watch( './src/blocks/**/*.js', () => gulp.start( 'js:main' ) );
-    watch( './src/*.html', bs.reload );
 } );
 
 /**
