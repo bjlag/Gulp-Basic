@@ -12,7 +12,9 @@ const gulp = require( 'gulp' ),
     sourcemaps = require( 'gulp-sourcemaps' ),
     minifyCss = require( 'gulp-clean-css' ),
     fileinclude = require('gulp-file-include'),
-    favicons = require( 'gulp-favicons' );
+    favicons = require( 'gulp-favicons' ),
+    uglify = require( 'gulp-uglify' ),
+    gcmq = require('gulp-group-css-media-queries');;
 
 const wiredep = require( 'wiredep' ).stream;
 const useref = require( 'gulp-useref' );
@@ -20,14 +22,14 @@ const useref = require( 'gulp-useref' );
 const bs = require( 'browser-sync' ).create();
 const watch = require( 'gulp-watch' );
 const gulpif = require( 'gulp-if' );
-const uglify = require( 'gulp-uglify' );
+
 
 const imagemin = require( 'gulp-imagemin' );
 const imageminJpeg = require( 'imagemin-jpeg-recompress' );
 const imageminPng = require( 'imagemin-pngquant' );
 
 
-const gcmq = require('gulp-group-css-media-queries');
+
 const runSequence = require( 'run-sequence' );
 const cache = require( 'gulp-cache' );
 
@@ -90,13 +92,6 @@ gulp.task( 'html', () => {
     return gulp.src( './src/html/pages/*.html' )
         .pipe( fileinclude() )
         .pipe( gulp.dest( './src' ) );
-} );
-
-gulp.task( 'bower', () => {
-    // todo: удалить
-    return gulp.src( path.src.root + '/*.html' )
-        .pipe( wiredep() )
-        .pipe( gulp.dest( path.src.root ) );
 } );
 
 gulp.task( 'css:main', () => {
@@ -252,13 +247,8 @@ gulp.task( 'favicon:move', [ 'favicon:clean-assets' ], () => {
  * Build tasks
  */
 
-gulp.task( 'build:fonts', () => {
-    return gulp.src( path.src.fonts )
-        .pipe( gulp.dest( path.dist.fonts ) );
-} );
-
-gulp.task( 'build:images', () => {
-    return gulp.src( path.src.images )
+gulp.task( 'images', () => {
+    return gulp.src( './src/assets/images/**/*' )
         .pipe( cache(
             imagemin(
                 [
@@ -287,7 +277,7 @@ gulp.task( 'build:images', () => {
                 }
             )
         ) )
-        .pipe( gulp.dest( path.dist.images ) );
+        .pipe( gulp.dest( './dist/assets/images' ) );
 } );
 
 gulp.task( 'build:php', () => {
