@@ -81,14 +81,34 @@ gulp.task( 'clean:cache', ( done ) => {
 } );
 
 gulp.task( 'html', () => {
-    return gulp.src( './src/html/pages/*.html' )
-        .pipe( fileinclude() )
-        .pipe( gulp.dest( './src' ) )
+    let isProduction = argv.prod,
+        srcPath = (isProduction ? './src/*.html' : './src/html/pages/*.html'),
+        distPath = (isProduction ? './dist' : './src');
+
+    return gulp.src( srcPath )
+        .pipe( gulpif( !isProduction, fileinclude() ) )
+        .pipe( gulp.dest( distPath ) )
         .pipe( bs.stream() );
 } );
 
+gulp.task( 'fonts', () => {
+    let isProduction = argv.prod,
+        srcPath = './src/assets/fonts/**/*',
+        distPath = (isProduction ? './dist/assets/fonts' : './src/assets/fonts');
+
+    if ( !isProduction ) {
+        srcPath = [
+            './src/libs/bootstrap/dist/fonts/**/*',
+            './src/libs/font-awesome/fonts/**/*'
+        ];
+    }
+
+    return gulp.src( srcPath )
+        .pipe( gulp.dest( distPath ) );
+} );
+
 gulp.task( 'css:main', () => {
-    const isProduction = argv.prod,
+    let isProduction = argv.prod,
         distPath = (isProduction ? './dist/assets/css' : './src/assets/css');
 
     return gulp.src( './src/blocks/**/*.+(sass|scss)' )
@@ -117,7 +137,7 @@ gulp.task( 'css:main', () => {
 } );
 
 gulp.task( 'css:libs', () => {
-    const isProduction = argv.prod,
+    let isProduction = argv.prod,
         distPath = (isProduction ? './dist/assets/css' : './src/assets/css'),
         libs = [
             './src/libs/normalize-css/normalize.css',
@@ -147,18 +167,8 @@ gulp.task( 'css:libs', () => {
         .pipe( bs.stream() );
 } );
 
-gulp.task( 'fonts', () => {
-    const fonts = [
-        './src/libs/bootstrap/dist/fonts/**/*',
-        './src/libs/font-awesome/fonts/**/*'
-    ];
-
-    return gulp.src( fonts )
-        .pipe( gulp.dest( './src/assets/fonts' ) );
-} );
-
 gulp.task( 'js:main', () => {
-    const isProduction = argv.prod,
+    let isProduction = argv.prod,
         distPath = (isProduction ? './dist/assets/js' : './src/assets/js');
 
     return gulp.src( './src/blocks/**/*.js' )
@@ -171,7 +181,7 @@ gulp.task( 'js:main', () => {
 } );
 
 gulp.task( 'js:libs', () => {
-    const isProduction = argv.prod,
+    let isProduction = argv.prod,
         distPath = (isProduction ? './dist/assets/js' : './src/assets/js'),
         libs = [
             './src/libs/jquery/dist/jquery.min.js',
@@ -297,37 +307,28 @@ gulp.task( 'images', () => {
         .pipe( gulp.dest( './dist/assets/images' ) );
 } );
 
-gulp.task( 'dist', [ 'clean:dist' ], () => {
-    if ( !argv.prod ) {
-        console.log( 'Отмена задачи, не передан параметр --prod' );
-        return false;
-    }
-
-    gulp.src( './src/*.html' )
-        .pipe( gulp.dest( './dist' ) );
-
-    gulp.src( './src/assets/fonts/**/*' )
-        .pipe( gulp.dest( './dist/assets/fonts' ) );
-
-    runSequence(
-        'dist',
-        [
-            'css:main',
-            'css:libs',
-            'js:main',
-            'js:libs',
-            'images'
-        ]
-    );
-} );
-
 /**
  * Main tasks
  */
 
+/**
+ * gulp build --prod (продакшен)
+ * gulp build (разработка)
+ */
 gulp.task( 'build', () => {
     if ( argv.prod ) {
-        runSequence( 'dist' );
+        runSequence(
+            'clean:dist',
+            [
+                'html',
+                'fonts',
+                'css:main',
+                'css:libs',
+                'js:main',
+                'js:libs',
+                'images'
+            ]
+        );
     } else {
         runSequence(
             [
