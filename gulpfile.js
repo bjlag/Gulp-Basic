@@ -91,7 +91,8 @@ gulp.task( 'clean:cache', ( done ) => {
 gulp.task( 'html', () => {
     return gulp.src( './src/html/pages/*.html' )
         .pipe( fileinclude() )
-        .pipe( gulp.dest( './src' ) );
+        .pipe( gulp.dest( './src' ) )
+        .pipe( bs.stream() );
 } );
 
 gulp.task( 'css:main', () => {
@@ -165,7 +166,8 @@ gulp.task( 'js:main', () => {
     return gulp.src( './src/blocks/**/*.js' )
         .pipe( concat( 'main.min.js' ) )
         .pipe( uglify() )
-        .pipe( gulp.dest( './src/assets/js' ) );
+        .pipe( gulp.dest( './src/assets/js' ) )
+        .pipe( bs.stream() );
 } );
 
 gulp.task( 'js:libs', () => {
@@ -315,16 +317,15 @@ gulp.task( 'build:mini', () => {
 gulp.task( 'browser-sync', () => {
     bs.init( {
         server: {
-            baseDir: path.src.root
+            baseDir: './src'
         },
         notify: false
     } );
-    watch( path.watch, bs.reload );
-} );
 
-gulp.task( 'watch', () => {
-    watch( path.src.sass, () => gulp.start( 'css' ) );
-    watch( './bower.json', () => gulp.start( 'bower' ) );
+    watch( './src/html/pages/*.html', () => gulp.start( 'html' ) );
+    watch( './src/blocks/**/*.+(sass|scss)', () => gulp.start( 'css:main' ) );
+    watch( './src/blocks/**/*.js', () => gulp.start( 'js:main' ) );
+    watch( './src/*.html', bs.reload );
 } );
 
 /**
