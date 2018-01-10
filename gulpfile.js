@@ -30,6 +30,7 @@ const gulp = require( 'gulp' ),
 // Setting
 //-----------------------------------------------------
 
+// todo: передалать пути
 const path = {
     dist: {
         root: './dist',
@@ -316,6 +317,7 @@ gulp.task( 'images', () => {
  * gulp build (разработка)
  */
 gulp.task( 'build', () => {
+    // todo: избавиться от копипаста
     if ( argv.prod ) {
         runSequence(
             'clean:dist',
