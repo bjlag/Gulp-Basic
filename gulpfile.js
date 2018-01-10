@@ -134,7 +134,8 @@ gulp.task( 'css:libs', () => {
     // todo: если продакшет, то выключить sourcemap
     const libs = [
         './src/libs/normalize-css/normalize.css',
-        './src/libs/bootstrap/dist/css/bootstrap.css'
+        './src/libs/bootstrap/dist/css/bootstrap.css',
+        './src/libs/font-awesome/css/font-awesome.min.css'
     ];
 
     return gulp.src( libs )
@@ -157,6 +158,16 @@ gulp.task( 'css:libs', () => {
         .pipe( sourcemaps.write( '/' ) )
         .pipe( gulp.dest( './src/assets/css' ) )
         .pipe( bs.stream() );
+} );
+
+gulp.task( 'fonts', () => {
+    const fonts = [
+        './src/libs/bootstrap/fonts/**/*',
+        './src/libs/font-awesome/fonts/**/*'
+    ];
+
+    return gulp.src( fonts )
+        .pipe( gulp.dest( './src/assets/fonts' ) );
 } );
 
 /**

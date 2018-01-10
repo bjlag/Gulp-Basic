@@ -1,22 +1,23 @@
 {
-    "name": "personal_kadri_lend",
-    "description": "",
-    "main": "index.js",
-    "authors": [
-        "bjlag <vlad.duplin@ya.ru>"
-    ],
-    "license": "ISC",
-    "homepage": "",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test",
-        "tests"
-    ],
-    "dependencies": {
-        "normalize-css": "^7.0.0",
-        "jquery": "^3.2.1",
-        "bootstrap": "^3.3.7"
-    }
+  "name": "personal_kadri_lend",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "bjlag <vlad.duplin@ya.ru>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "normalize-css": "^7.0.0",
+    "jquery": "^3.2.1",
+    "bootstrap": "^3.3.7",
+    "font-awesome": "^4.7.0"
+  }
 }
