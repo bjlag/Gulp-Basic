@@ -99,10 +99,6 @@ gulp.task( 'bower', () => {
         .pipe( gulp.dest( path.src.root ) );
 } );
 
-// gulp.task( 'js', () => {
-//     return gulp.src( '' )
-// } );
-
 gulp.task( 'css:main', () => {
     // todo: если продакшет, то выключить sourcemap
     return gulp.src( './src/blocks/**/*.+(sass|scss)' )
@@ -162,12 +158,31 @@ gulp.task( 'css:libs', () => {
 
 gulp.task( 'fonts', () => {
     const fonts = [
-        './src/libs/bootstrap/fonts/**/*',
+        './src/libs/bootstrap/dist/fonts/**/*',
         './src/libs/font-awesome/fonts/**/*'
     ];
 
     return gulp.src( fonts )
         .pipe( gulp.dest( './src/assets/fonts' ) );
+} );
+
+gulp.task( 'js:main', () => {
+    return gulp.src( './src/blocks/**/*.js' )
+        .pipe( concat( 'main.min.js' ) )
+        .pipe( uglify() )
+        .pipe( gulp.dest( './src/assets/js' ) );
+} );
+
+gulp.task( 'js:libs', () => {
+    const libs = [
+        './src/libs/jquery/dist/jquery.min.js',
+        './src/libs/bootstrap/dist/js/bootstrap.min.js'
+    ];
+
+    return gulp.src( libs )
+        .pipe( concat( 'vendor.min.js' ) )
+        .pipe( uglify() )
+        .pipe( gulp.dest( './src/assets/js' ) );
 } );
 
 /**
