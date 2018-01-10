@@ -191,16 +191,12 @@ gulp.task( 'browser-sync', () => {
  * Favicons
  */
 
-gulp.task( 'favicon:clean-resource', () => {
-    return del( './src/favicons/icons' );
+gulp.task( 'favicon:clean', () => {
+    return del( [ './src/favicons/icons', './src/assets/images/favicons' ] );
 } );
 
-gulp.task( 'favicon:clean-assets', () => {
-    return del( './src/assets/images/favicons' );
-} );
-
-gulp.task( 'favicon:generate', [ 'favicon:clean-resource' ], () => {
-    return gulp.src( './src/favicons/favicon-master.png' )
+gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
+    gulp.src( './src/favicons/favicon-master.png' )
         .pipe( favicons( {
             appName: null,                  // Your application's name. `string`
             appDescription: null,           // Your application's description. `string`
@@ -242,12 +238,8 @@ gulp.task( 'favicon:generate', [ 'favicon:clean-resource' ], () => {
                 yandex: false            // Create Yandex browser icon. `boolean` or `{ background }`
             }
         } ) )
+        .pipe( gulpif( '*.+(ico|png|svg|xml)', gulp.dest( './src/assets/images/favicons' ) )  )
         .pipe( gulp.dest( path.favicons.dist ) );
-} );
-
-gulp.task( 'favicon:move', [ 'favicon:clean-assets' ], () => {
-    return gulp.src( './src/favicons/icons/*.+(ico|png|svg|xml)' )
-        .pipe( gulp.dest( './src/assets/images/favicons' ) );
 } );
 
 /**
