@@ -24,10 +24,11 @@
     "gulp-watch": "^4.3.11",
     "imagemin-jpeg-recompress": "^5.1.0",
     "imagemin-pngquant": "^5.0.1",
-    "run-sequence": "^2.2.0"
+    "run-sequence": "^2.2.0",
+    "yargs": "^10.1.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prod": "gulp build --prod"
   },
   "author": "",
   "license": "ISC"

@@ -22,7 +22,8 @@ const gulp = require( 'gulp' ),
     imageminJpeg = require( 'imagemin-jpeg-recompress' ),
     imageminPng = require( 'imagemin-pngquant' ),
     runSequence = require( 'run-sequence' ),
-    cache = require( 'gulp-cache' );
+    cache = require( 'gulp-cache' ),
+    argv = require( 'yargs' ).argv;
 
 
 //-----------------------------------------------------
@@ -87,14 +88,16 @@ gulp.task( 'html', () => {
 } );
 
 gulp.task( 'css:main', () => {
-    // todo: если продакшет, то выключить sourcemap
+    const isProduction = argv.prod,
+        distPath = (isProduction ? './dist/assets/css' : './src/assets/css');
+
     return gulp.src( './src/blocks/**/*.+(sass|scss)' )
-        .pipe( sourcemaps.init() )
+        .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( sass() )
         .pipe( concat( 'styles.min.css' ) )
         .pipe( gcmq() )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
-        .pipe( minifyCss(
+        .pipe( gulpif( isProduction, minifyCss(
             {
                 compatibility: 'ie9',
                 level: {
@@ -106,25 +109,26 @@ gulp.task( 'css:main', () => {
             ( details ) => {
                 console.log( `${ details.name }: ${ details.stats.originalSize }` );
                 console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
-            } )
+            } ) )
         )
-        .pipe( sourcemaps.write( '/' ) )
-        .pipe( gulp.dest( './src/assets/css' ) )
+        .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
+        .pipe( gulp.dest( distPath ) )
         .pipe( bs.stream() );
 } );
 
 gulp.task( 'css:libs', () => {
-    // todo: если продакшет, то выключить sourcemap
-    const libs = [
-        './src/libs/normalize-css/normalize.css',
-        './src/libs/bootstrap/dist/css/bootstrap.css',
-        './src/libs/font-awesome/css/font-awesome.min.css'
-    ];
+    const isProduction = argv.prod,
+        distPath = (isProduction ? './dist/assets/css' : './src/assets/css'),
+        libs = [
+            './src/libs/normalize-css/normalize.css',
+            './src/libs/bootstrap/dist/css/bootstrap.css',
+            './src/libs/font-awesome/css/font-awesome.css'
+        ];
 
     return gulp.src( libs )
-        .pipe( sourcemaps.init() )
+        .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'vendor.min.css' ) )
-        .pipe( minifyCss(
+        .pipe( gulpif( isProduction, minifyCss(
             {
                 compatibility: 'ie9',
                 level: {
@@ -136,10 +140,10 @@ gulp.task( 'css:libs', () => {
             ( details ) => {
                 console.log( `${ details.name }: ${ details.stats.originalSize }` );
                 console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
-            } )
+            } ) )
         )
-        .pipe( sourcemaps.write( '/' ) )
-        .pipe( gulp.dest( './src/assets/css' ) )
+        .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
+        .pipe( gulp.dest( distPath ) )
         .pipe( bs.stream() );
 } );
 
@@ -154,26 +158,40 @@ gulp.task( 'fonts', () => {
 } );
 
 gulp.task( 'js:main', () => {
+    const isProduction = argv.prod,
+        distPath = (isProduction ? './dist/assets/js' : './src/assets/js');
+
     return gulp.src( './src/blocks/**/*.js' )
+        .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'main.min.js' ) )
-        .pipe( uglify() )
-        .pipe( gulp.dest( './src/assets/js' ) )
+        .pipe( gulpif( isProduction, uglify() ) )
+        .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
+        .pipe( gulp.dest( distPath ) )
         .pipe( bs.stream() );
 } );
 
 gulp.task( 'js:libs', () => {
-    const libs = [
-        './src/libs/jquery/dist/jquery.min.js',
-        './src/libs/bootstrap/dist/js/bootstrap.min.js'
-    ];
+    const isProduction = argv.prod,
+        distPath = (isProduction ? './dist/assets/js' : './src/assets/js'),
+        libs = [
+            './src/libs/jquery/dist/jquery.min.js',
+            './src/libs/bootstrap/dist/js/bootstrap.min.js'
+        ];
 
     return gulp.src( libs )
+        .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'vendor.min.js' ) )
-        .pipe( uglify() )
-        .pipe( gulp.dest( './src/assets/js' ) );
+        .pipe( gulpif( isProduction, uglify() ) )
+        .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
+        .pipe( gulp.dest( distPath ) );
 } );
 
 gulp.task( 'browser-sync', () => {
+    if ( argv.prod ) {
+        console.log( 'Продакшен, задача отменена' );
+        return false;
+    }
+
     bs.init( {
         server: {
             baseDir: './src'
@@ -238,12 +256,12 @@ gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
                 yandex: false            // Create Yandex browser icon. `boolean` or `{ background }`
             }
         } ) )
-        .pipe( gulpif( '*.+(ico|png|svg|xml)', gulp.dest( './src/assets/images/favicons' ) )  )
+        .pipe( gulpif( '*.+(ico|png|svg|xml)', gulp.dest( './src/assets/images/favicons' ) ) )
         .pipe( gulp.dest( path.favicons.dist ) );
 } );
 
 /**
- * Build tasks
+ * Production tasks
  */
 
 gulp.task( 'images', () => {
@@ -279,29 +297,48 @@ gulp.task( 'images', () => {
         .pipe( gulp.dest( './dist/assets/images' ) );
 } );
 
+gulp.task( 'dist', [ 'clean:dist' ], () => {
+    if ( !argv.prod ) {
+        console.log( 'Отмена задачи, не передан параметр --prod' );
+        return false;
+    }
+
+    gulp.src( './src/*.html' )
+        .pipe( gulp.dest( './dist' ) );
+
+    gulp.src( './src/assets/fonts/**/*' )
+        .pipe( gulp.dest( './dist/assets/fonts' ) );
+
+    runSequence(
+        'dist',
+        [
+            'css:main',
+            'css:libs',
+            'js:main',
+            'js:libs',
+            'images'
+        ]
+    );
+} );
+
 /**
  * Main tasks
  */
 
 gulp.task( 'build', () => {
-    runSequence(
-        'clean:dist',
-        'favicons:generate-icons',
-        'favicons:move-icons',
-        'build:images',
-        [ 'build:fonts', 'build:mini', 'build:php' ]
-    );
-} );
-
-gulp.task( 'dev', () => {
-    runSequence(
-        [
-            'html',
-            'css:main',
-            'css:libs',
-            'js:main',
-            'js:libs',
-            'fonts'
-        ],
-        'browser-sync' );
+    if ( argv.prod ) {
+        runSequence( 'dist' );
+    } else {
+        runSequence(
+            [
+                'html',
+                'css:main',
+                'css:libs',
+                'js:main',
+                'js:libs',
+                'fonts'
+            ],
+            'browser-sync'
+        );
+    }
 } );
