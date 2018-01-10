@@ -28,7 +28,8 @@
     "yargs": "^10.1.1"
   },
   "scripts": {
-    "prod": "gulp build --prod"
+    "prod": "gulp build --prod",
+    "dev": "gulp build"
   },
   "author": "",
   "license": "ISC"
