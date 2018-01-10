@@ -7,22 +7,26 @@
 const gulp = require( 'gulp' ),
     del = require( 'del' ),
     sass = require( 'gulp-sass' ),
-    concat = require( 'gulp-concat' );
+    concat = require( 'gulp-concat' ),
+    autoprefixer = require( 'gulp-autoprefixer' ),
+    sourcemaps = require( 'gulp-sourcemaps' ),
+    minifyCss = require( 'gulp-clean-css' ),
+    fileinclude = require('gulp-file-include'),
+    favicons = require( 'gulp-favicons' );
 
 const wiredep = require( 'wiredep' ).stream;
 const useref = require( 'gulp-useref' );
-const autoprefixer = require( 'gulp-autoprefixer' );
-const sourcemaps = require( 'gulp-sourcemaps' );
+
 const bs = require( 'browser-sync' ).create();
 const watch = require( 'gulp-watch' );
 const gulpif = require( 'gulp-if' );
 const uglify = require( 'gulp-uglify' );
-const minifyCss = require( 'gulp-clean-css' );
+
 const imagemin = require( 'gulp-imagemin' );
 const imageminJpeg = require( 'imagemin-jpeg-recompress' );
 const imageminPng = require( 'imagemin-pngquant' );
-const favicons = require( 'gulp-favicons' );
-const fileinclude = require('gulp-file-include');
+
+
 const gcmq = require('gulp-group-css-media-queries');
 const runSequence = require( 'run-sequence' );
 const cache = require( 'gulp-cache' );
@@ -83,11 +87,13 @@ gulp.task( 'clean:cache', ( done ) => {
 } );
 
 gulp.task( 'html', () => {
-    return gulp.src( path.src.html )
-        .pipe( gulp.dest( path.dist.root ) );
+    return gulp.src( './src/html/pages/*.html' )
+        .pipe( fileinclude() )
+        .pipe( gulp.dest( './src' ) );
 } );
 
 gulp.task( 'bower', () => {
+    // todo: удалить
     return gulp.src( path.src.root + '/*.html' )
         .pipe( wiredep() )
         .pipe( gulp.dest( path.src.root ) );
@@ -157,16 +163,16 @@ gulp.task( 'css:libs', () => {
  * Favicons
  */
 
-gulp.task( 'favicons:clean-src', () => {
-    return del( path.favicons.dist );
+gulp.task( 'favicon:clean-resource', () => {
+    return del( './src/favicons/icons' );
 } );
 
-gulp.task( 'favicons:clean-dist', () => {
-    return del( path.src.favicons );
+gulp.task( 'favicon:clean-assets', () => {
+    return del( './src/assets/images/favicons' );
 } );
 
-gulp.task( 'favicons:generate-icons', [ 'favicons:clean-src' ], () => {
-    return gulp.src( path.favicons.masterPicture )
+gulp.task( 'favicon:generate', [ 'favicon:clean-resource' ], () => {
+    return gulp.src( './src/favicons/favicon-master.png' )
         .pipe( favicons( {
             appName: null,                  // Your application's name. `string`
             appDescription: null,           // Your application's description. `string`
@@ -174,7 +180,7 @@ gulp.task( 'favicons:generate-icons', [ 'favicons:clean-src' ], () => {
             developerURL: null,             // Your (or your developer's) URL. `string`
             background: '#fff',             // Background colour for flattened icons. `string`
             theme_color: '#fff',            // Theme color for browser chrome. `string`
-            path: "images/favicons",       // Path for overriding default icons path. `string`
+            path: "assets/images/favicons",       // Path for overriding default icons path. `string`
             display: "standalone",          // Android display: "browser" or "standalone". `string`
             orientation: "portrait",        // Android orientation: "portrait" or "landscape". `string`
             start_url: "/?homescreen=1",    // Android start application's URL. `string`
@@ -182,7 +188,7 @@ gulp.task( 'favicons:generate-icons', [ 'favicons:clean-src' ], () => {
             logging: false,                 // Print logs to console? `boolean`
             online: false,                  // Use RealFaviconGenerator to create favicons? `boolean`
             preferOnline: false,            // Use offline generation, if online generation has failed. `boolean`
-            html: 'inject.html',
+            html: '../../html/includes/favicons.html',
             pipeHTML: true,
             replace: true,
             icons: {
@@ -211,9 +217,9 @@ gulp.task( 'favicons:generate-icons', [ 'favicons:clean-src' ], () => {
         .pipe( gulp.dest( path.favicons.dist ) );
 } );
 
-gulp.task( 'favicons:move-icons', [ 'favicons:clean-dist' ], () => {
-    return gulp.src( path.favicons.dist + '/*.+(ico|png|svg|xml)' )
-        .pipe( gulp.dest( path.src.favicons ) );
+gulp.task( 'favicon:move', [ 'favicon:clean-assets' ], () => {
+    return gulp.src( './src/favicons/icons/*.+(ico|png|svg|xml)' )
+        .pipe( gulp.dest( './src/assets/images/favicons' ) );
 } );
 
 /**
