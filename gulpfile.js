@@ -343,5 +343,14 @@ gulp.task( 'build', () => {
 } );
 
 gulp.task( 'dev', () => {
-    runSequence( [ 'css', 'bower' ], 'watch', 'browser-sync' );
+    runSequence(
+        [
+            'html',
+            'css:main',
+            'css:libs',
+            'js:main',
+            'js:libs',
+            'fonts'
+        ],
+        'browser-sync' );
 } );
