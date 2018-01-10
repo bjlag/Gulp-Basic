@@ -4,9 +4,11 @@
 // Libraries
 //-----------------------------------------------------
 
-const gulp = require( 'gulp' );
-const del = require( 'del' );
-const sass = require( 'gulp-sass' );
+const gulp = require( 'gulp' ),
+    del = require( 'del' ),
+    sass = require( 'gulp-sass' ),
+    concat = require( 'gulp-concat' );
+
 const wiredep = require( 'wiredep' ).stream;
 const useref = require( 'gulp-useref' );
 const autoprefixer = require( 'gulp-autoprefixer' );
@@ -91,13 +93,34 @@ gulp.task( 'bower', () => {
         .pipe( gulp.dest( path.src.root ) );
 } );
 
-gulp.task( 'css', () => {
-    return gulp.src( path.src.sass )
+// gulp.task( 'js', () => {
+//     return gulp.src( '' )
+// } );
+
+gulp.task( 'css:main', () => {
+    // todo: если продакшет, то выключить sourcemap
+    return gulp.src( './src/blocks/**/*.+(sass|scss)' )
         .pipe( sourcemaps.init() )
         .pipe( sass( { outputStyle: 'expanded' } ) ).on( 'error', sass.logError )
+        .pipe( concat( 'styles.min.css' ) )
+        .pipe( gcmq() )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
+        .pipe( minifyCss(
+            {
+                compatibility: 'ie9',
+                level: {
+                    1: {
+                        specialComments: false // удаляем все комментарии
+                    }
+                }
+            },
+            ( details ) => {
+                console.log( `${ details.name }: ${ details.stats.originalSize }` );
+                console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
+            } )
+        )
         .pipe( sourcemaps.write( '/' ) )
-        .pipe( gulp.dest( path.src.css ) )
+        .pipe( gulp.dest( './src/assets/css' ) )
         .pipe( bs.stream() );
 } );
 

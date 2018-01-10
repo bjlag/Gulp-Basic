@@ -1,17 +1,17 @@
 body
-    font-family: sans-serif
+    font-family: $base-fonts
 
 input:focus:required:invalid,
 textarea:focus:required:invalid
-    border: 1px solid #ff0000
+    border: 1px solid $error-color
 
 input:focus:required:valid,
 textarea:focus:required:valid
-    border: 1px solid green
+    border: 1px solid $success-color
 
 *::-webkit-input-placeholder,
 *:-moz-placeholder,
 *::-moz-placeholder,
 *:-ms-input-placeholder
-    color: #666
+    color: lighten( $base-color, $change-color * 2 )
     opacity: 1
