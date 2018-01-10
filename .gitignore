@@ -1,4 +1,4 @@
 .idea
-src/lib
+src/libs
 node_modules
 dist

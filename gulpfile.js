@@ -101,10 +101,39 @@ gulp.task( 'css:main', () => {
     // todo: если продакшет, то выключить sourcemap
     return gulp.src( './src/blocks/**/*.+(sass|scss)' )
         .pipe( sourcemaps.init() )
-        .pipe( sass( { outputStyle: 'expanded' } ) ).on( 'error', sass.logError )
+        .pipe( sass() )
         .pipe( concat( 'styles.min.css' ) )
         .pipe( gcmq() )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
+        .pipe( minifyCss(
+            {
+                compatibility: 'ie9',
+                level: {
+                    1: {
+                        specialComments: false // удаляем все комментарии
+                    }
+                }
+            },
+            ( details ) => {
+                console.log( `${ details.name }: ${ details.stats.originalSize }` );
+                console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
+            } )
+        )
+        .pipe( sourcemaps.write( '/' ) )
+        .pipe( gulp.dest( './src/assets/css' ) )
+        .pipe( bs.stream() );
+} );
+
+gulp.task( 'css:libs', () => {
+    // todo: если продакшет, то выключить sourcemap
+    const libs = [
+        './src/libs/normalize-css/normalize.css',
+        './src/libs/bootstrap/dist/css/bootstrap.css'
+    ];
+
+    return gulp.src( libs )
+        .pipe( sourcemaps.init() )
+        .pipe( concat( 'vendor.min.css' ) )
         .pipe( minifyCss(
             {
                 compatibility: 'ie9',
