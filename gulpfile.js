@@ -41,7 +41,7 @@ const path = {
         tpl: './src/html/pages/*.html'
     },
     fonts: {
-        all: './src/assets/fonts/**/*',
+        ready: './src/assets/fonts/**/*',
         dist: './dist/assets/fonts',
         src: './src/assets/fonts',
         libs: [
@@ -76,14 +76,14 @@ const path = {
         ready: './src/assets/images/favicons',
         master: './src/favicons/favicon-master.png',
         src: './src/favicons/icons',
-        dist: './src/favicons/icons',
-        html: '../../html/includes/favicons.html'
+        html: '../../html/includes/favicons.html',
+        path: 'assets/images/favicons'
     },
     watch: {
-        html: './src/html/pages/*.html',
+        html: './src/html/**/*.html',
         sass: './src/blocks/**/*.+(sass|scss)',
         js: './src/blocks/**/*.js',
-        browserSync: './src/*.html'
+        reload: './src/*.html'
     }
 };
 
@@ -97,7 +97,7 @@ const path = {
  */
 
 gulp.task( 'clean:dist', () => {
-    return del( './dist' );
+    return del( path.root.dist );
 } );
 
 gulp.task( 'clean:cache', ( done ) => {
@@ -106,8 +106,8 @@ gulp.task( 'clean:cache', ( done ) => {
 
 gulp.task( 'html', () => {
     let isProduction = argv.prod,
-        srcPath = (isProduction ? './src/*.html' : './src/html/pages/*.html'),
-        distPath = (isProduction ? './dist' : './src');
+        srcPath = (isProduction ? path.html.ready : path.html.tpl),
+        distPath = (isProduction ? path.root.dist : path.root.src);
 
     return gulp.src( srcPath )
         .pipe( gulpif( !isProduction, fileinclude() ) )
@@ -117,14 +117,11 @@ gulp.task( 'html', () => {
 
 gulp.task( 'fonts', () => {
     let isProduction = argv.prod,
-        srcPath = './src/assets/fonts/**/*',
-        distPath = (isProduction ? './dist/assets/fonts' : './src/assets/fonts');
+        srcPath = path.fonts.ready,
+        distPath = (isProduction ? path.fonts.dist : path.fonts.src);
 
     if ( !isProduction ) {
-        srcPath = [
-            './src/libs/bootstrap/dist/fonts/**/*',
-            './src/libs/font-awesome/fonts/**/*'
-        ];
+        srcPath = path.fonts.libs;
     }
 
     return gulp.src( srcPath )
@@ -133,9 +130,9 @@ gulp.task( 'fonts', () => {
 
 gulp.task( 'css:main', () => {
     let isProduction = argv.prod,
-        distPath = (isProduction ? './dist/assets/css' : './src/assets/css');
+        distPath = (isProduction ? path.css.dist : path.css.src);
 
-    return gulp.src( './src/blocks/**/*.+(sass|scss)' )
+    return gulp.src( path.css.sass )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( sass() )
         .pipe( concat( 'styles.min.css' ) )
@@ -162,12 +159,8 @@ gulp.task( 'css:main', () => {
 
 gulp.task( 'css:libs', () => {
     let isProduction = argv.prod,
-        distPath = (isProduction ? './dist/assets/css' : './src/assets/css'),
-        libs = [
-            './src/libs/normalize-css/normalize.css',
-            './src/libs/bootstrap/dist/css/bootstrap.css',
-            './src/libs/font-awesome/css/font-awesome.css'
-        ];
+        distPath = (isProduction ? path.css.dist : path.css.src),
+        libs = path.css.libs;
 
     return gulp.src( libs )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
@@ -193,9 +186,9 @@ gulp.task( 'css:libs', () => {
 
 gulp.task( 'js:main', () => {
     let isProduction = argv.prod,
-        distPath = (isProduction ? './dist/assets/js' : './src/assets/js');
+        distPath = (isProduction ? path.js.dist : path.js.src);
 
-    return gulp.src( './src/blocks/**/*.js' )
+    return gulp.src( path.js.code )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'main.min.js' ) )
         .pipe( gulpif( isProduction, uglify() ) )
@@ -206,11 +199,8 @@ gulp.task( 'js:main', () => {
 
 gulp.task( 'js:libs', () => {
     let isProduction = argv.prod,
-        distPath = (isProduction ? './dist/assets/js' : './src/assets/js'),
-        libs = [
-            './src/libs/jquery/dist/jquery.min.js',
-            './src/libs/bootstrap/dist/js/bootstrap.min.js'
-        ];
+        distPath = (isProduction ? path.js.dist : path.js.src),
+        libs = path.js.libs;
 
     return gulp.src( libs )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
@@ -228,15 +218,15 @@ gulp.task( 'browser-sync', () => {
 
     bs.init( {
         server: {
-            baseDir: './src'
+            baseDir: path.root.src
         },
         notify: false
     } );
 
-    watch( './src/html/pages/*.html', () => gulp.start( 'html' ) );
-    watch( './src/blocks/**/*.+(sass|scss)', () => gulp.start( 'css:main' ) );
-    watch( './src/blocks/**/*.js', () => gulp.start( 'js:main' ) );
-    watch( './src/*.html', bs.reload );
+    watch( path.watch.html, () => gulp.start( 'html' ) );
+    watch( path.watch.sass, () => gulp.start( 'css:main' ) );
+    watch( path.watch.js, () => gulp.start( 'js:main' ) );
+    watch( path.watch.reload, bs.reload );
 } );
 
 /**
@@ -244,11 +234,11 @@ gulp.task( 'browser-sync', () => {
  */
 
 gulp.task( 'favicon:clean', () => {
-    return del( [ './src/favicons/icons', './src/assets/images/favicons' ] );
+    return del( [ path.favicons.src, path.favicons.ready ] );
 } );
 
 gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
-    gulp.src( './src/favicons/favicon-master.png' )
+    gulp.src( path.favicons.master )
         .pipe( favicons( {
             appName: null,                  // Your application's name. `string`
             appDescription: null,           // Your application's description. `string`
@@ -256,7 +246,7 @@ gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
             developerURL: null,             // Your (or your developer's) URL. `string`
             background: '#fff',             // Background colour for flattened icons. `string`
             theme_color: '#fff',            // Theme color for browser chrome. `string`
-            path: "assets/images/favicons",       // Path for overriding default icons path. `string`
+            path: path.favicons.path,       // Path for overriding default icons path. `string`
             display: "standalone",          // Android display: "browser" or "standalone". `string`
             orientation: "portrait",        // Android orientation: "portrait" or "landscape". `string`
             start_url: "/?homescreen=1",    // Android start application's URL. `string`
@@ -264,7 +254,7 @@ gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
             logging: false,                 // Print logs to console? `boolean`
             online: false,                  // Use RealFaviconGenerator to create favicons? `boolean`
             preferOnline: false,            // Use offline generation, if online generation has failed. `boolean`
-            html: '../../html/includes/favicons.html',
+            html: path.favicons.html,
             pipeHTML: true,
             replace: true,
             icons: {
@@ -290,8 +280,8 @@ gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
                 yandex: false            // Create Yandex browser icon. `boolean` or `{ background }`
             }
         } ) )
-        .pipe( gulpif( '*.+(ico|png|svg|xml)', gulp.dest( './src/assets/images/favicons' ) ) )
-        .pipe( gulp.dest( './src/favicons/icons' ) );
+        .pipe( gulpif( '*.+(ico|png|svg|xml)', gulp.dest( path.favicons.ready ) ) )
+        .pipe( gulp.dest( path.favicons.src ) );
 } );
 
 /**
@@ -299,7 +289,7 @@ gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
  */
 
 gulp.task( 'images', () => {
-    return gulp.src( './src/assets/images/**/*' )
+    return gulp.src( path.images.src )
         .pipe( cache(
             imagemin(
                 [
@@ -328,7 +318,7 @@ gulp.task( 'images', () => {
                 }
             )
         ) )
-        .pipe( gulp.dest( './dist/assets/images' ) );
+        .pipe( gulp.dest( path.images.dist ) );
 } );
 
 /**
