@@ -18,6 +18,7 @@ const gulp = require( 'gulp' ),
     bs = require( 'browser-sync' ).create(),
     watch = require( 'gulp-watch' ),
     gulpif = require( 'gulp-if' ),
+    htmlbeautify = require('gulp-html-beautify'),
     imagemin = require( 'gulp-imagemin' ),
     imageminJpeg = require( 'imagemin-jpeg-recompress' ),
     imageminPng = require( 'imagemin-pngquant' ),
@@ -110,6 +111,11 @@ gulp.task( 'html', () => {
 
     return gulp.src( srcPath )
         .pipe( gulpif( !isProduction, fileinclude() ) )
+        .pipe( htmlbeautify(
+            {
+                indentSize: 4
+            }
+        ) )
         .pipe( gulp.dest( distPath ) )
         .pipe( bs.stream() );
 } );
@@ -157,6 +163,7 @@ gulp.task( 'css:main', () => {
 } );
 
 gulp.task( 'css:libs', () => {
+    // todo: добавить gulp-uncss
     let isProduction = argv.prod,
         distPath = (isProduction ? path.css.dist : path.css.src),
         libs = path.css.libs;
