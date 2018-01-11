@@ -12,7 +12,7 @@ npm run build --prod // продакшен
 
 ## Структура папок
 
-* dist // продакшен
+* dist
     * assets  
         * css  
         * fonts  
