@@ -32,36 +32,59 @@ const gulp = require( 'gulp' ),
 
 // todo: передалать пути
 const path = {
-    dist: {
-        root: './dist',
-        css: './dist/css',
-        fonts: './dist/fonts',
-        images: './dist/images'
+    root: {
+        dist: './dist',
+        src: './src'
     },
-    src: {
-        root: './src',
-        html: './src/*.html',
-        sass: './src/sass/**/*.+(sass|scss)',
-        css: './src/css',
-        fonts: [
-            './src/fonts/**/*',
-            './src/lib/bootstrap/fonts/**/*'
-        ],
-        images: './src/images/**/*',
-        favicons: './src/images/favicons'
+    html: {
+        ready: './src/*.html',
+        tpl: './src/html/pages/*.html'
     },
-    php: [
-        // './src/include/**/*'
-    ],
+    fonts: {
+        all: './src/assets/fonts/**/*',
+        dist: './dist/assets/fonts',
+        src: './src/assets/fonts',
+        libs: [
+            './src/libs/bootstrap/dist/fonts/**/*',
+            './src/libs/font-awesome/fonts/**/*'
+        ]
+    },
+    css: {
+        sass: './src/blocks/**/*.+(sass|scss)',
+        dist: './dist/assets/css',
+        src: './src/assets/css',
+        libs: [
+            './src/libs/normalize-css/normalize.css',
+            './src/libs/bootstrap/dist/css/bootstrap.css',
+            './src/libs/font-awesome/css/font-awesome.css'
+        ]
+    },
+    js: {
+        code: './src/blocks/**/*.js',
+        dist: './dist/assets/js',
+        src: './src/assets/js',
+        libs: [
+            './src/libs/jquery/dist/jquery.min.js',
+            './src/libs/bootstrap/dist/js/bootstrap.min.js'
+        ]
+    },
+    images: {
+        src: './src/assets/images/**/*',
+        dist: './dist/assets/images'
+    },
     favicons: {
-        masterPicture: './src/favicons/favicon-master.png',
-        dist: './src/favicons/icons'
+        ready: './src/assets/images/favicons',
+        master: './src/favicons/favicon-master.png',
+        src: './src/favicons/icons',
+        dist: './src/favicons/icons',
+        html: '../../html/includes/favicons.html'
     },
-    watch: [
-        './src/сss/*.css',
-        './src/*.html',
-        '!./src/lib/**/*'
-    ]
+    watch: {
+        html: './src/html/pages/*.html',
+        sass: './src/blocks/**/*.+(sass|scss)',
+        js: './src/blocks/**/*.js',
+        browserSync: './src/*.html'
+    }
 };
 
 
@@ -74,7 +97,7 @@ const path = {
  */
 
 gulp.task( 'clean:dist', () => {
-    return del( path.dist.root );
+    return del( './dist' );
 } );
 
 gulp.task( 'clean:cache', ( done ) => {
@@ -268,7 +291,7 @@ gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
             }
         } ) )
         .pipe( gulpif( '*.+(ico|png|svg|xml)', gulp.dest( './src/assets/images/favicons' ) ) )
-        .pipe( gulp.dest( path.favicons.dist ) );
+        .pipe( gulp.dest( './src/favicons/icons' ) );
 } );
 
 /**
