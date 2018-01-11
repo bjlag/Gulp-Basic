@@ -30,7 +30,6 @@ const gulp = require( 'gulp' ),
 // Setting
 //-----------------------------------------------------
 
-// todo: передалать пути
 const path = {
     root: {
         dist: './dist',
@@ -329,32 +328,10 @@ gulp.task( 'images', () => {
  * gulp build --prod (продакшен)
  * gulp build (разработка)
  */
-gulp.task( 'build', () => {
-    // todo: избавиться от копипаста
+gulp.task( 'build', [ 'html', 'fonts', 'css:main', 'css:libs', 'js:main', 'js:libs', ], () => {
     if ( argv.prod ) {
-        runSequence(
-            'clean:dist',
-            [
-                'html',
-                'fonts',
-                'css:main',
-                'css:libs',
-                'js:main',
-                'js:libs',
-                'images'
-            ]
-        );
+        gulp.start( 'images' );
     } else {
-        runSequence(
-            [
-                'html',
-                'css:main',
-                'css:libs',
-                'js:main',
-                'js:libs',
-                'fonts'
-            ],
-            'browser-sync'
-        );
+        gulp.start( 'browser-sync' );
     }
 } );
