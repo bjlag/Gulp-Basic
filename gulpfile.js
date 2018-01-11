@@ -18,7 +18,7 @@ const gulp = require( 'gulp' ),
     bs = require( 'browser-sync' ).create(),
     watch = require( 'gulp-watch' ),
     gulpif = require( 'gulp-if' ),
-    htmlbeautify = require('gulp-html-beautify'),
+    htmlbeautify = require( 'gulp-html-beautify' ),
     imagemin = require( 'gulp-imagemin' ),
     imageminJpeg = require( 'imagemin-jpeg-recompress' ),
     imageminPng = require( 'imagemin-pngquant' ),
@@ -111,11 +111,9 @@ gulp.task( 'html', () => {
 
     return gulp.src( srcPath )
         .pipe( gulpif( !isProduction, fileinclude() ) )
-        .pipe( htmlbeautify(
-            {
-                indentSize: 4
-            }
-        ) )
+        .pipe( htmlbeautify( {
+            indentSize: 4
+        } ) )
         .pipe( gulp.dest( distPath ) )
         .pipe( bs.stream() );
 } );
@@ -143,8 +141,7 @@ gulp.task( 'css:main', () => {
         .pipe( concat( 'styles.min.css' ) )
         .pipe( gcmq() )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
-        .pipe( gulpif( isProduction, minifyCss(
-            {
+        .pipe( gulpif( isProduction, minifyCss( {
                 compatibility: 'ie9',
                 level: {
                     1: {
@@ -155,15 +152,13 @@ gulp.task( 'css:main', () => {
             ( details ) => {
                 console.log( `${ details.name }: ${ details.stats.originalSize }` );
                 console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
-            } ) )
-        )
+            } ) ) )
         .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
         .pipe( gulp.dest( distPath ) )
         .pipe( bs.stream() );
 } );
 
 gulp.task( 'css:libs', () => {
-    // todo: добавить gulp-uncss
     let isProduction = argv.prod,
         distPath = (isProduction ? path.css.dist : path.css.src),
         libs = path.css.libs;
@@ -171,8 +166,7 @@ gulp.task( 'css:libs', () => {
     return gulp.src( libs )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'vendor.min.css' ) )
-        .pipe( gulpif( isProduction, minifyCss(
-            {
+        .pipe( gulpif( isProduction, minifyCss( {
                 compatibility: 'ie9',
                 level: {
                     1: {
@@ -183,8 +177,7 @@ gulp.task( 'css:libs', () => {
             ( details ) => {
                 console.log( `${ details.name }: ${ details.stats.originalSize }` );
                 console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
-            } ) )
-        )
+            } ) ) )
         .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
         .pipe( gulp.dest( distPath ) )
         .pipe( bs.stream() );
