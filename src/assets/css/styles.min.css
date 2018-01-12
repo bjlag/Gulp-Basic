@@ -23,6 +23,31 @@ textarea:focus:required:valid {
   opacity: 1;
 }
 
+body {
+  font-family: "Roboto", sans-serif;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #090909;
+}
+
+input:focus:required:invalid,
+textarea:focus:required:invalid {
+  border: 1px solid #E53A40;
+}
+
+input:focus:required:valid,
+textarea:focus:required:valid {
+  border: 1px solid #0DA20E;
+}
+
+*::-webkit-input-placeholder,
+*:-moz-placeholder,
+*::-moz-placeholder,
+*:-ms-input-placeholder {
+  color: #6f6f6f;
+  opacity: 1;
+}
+
 .goto-top {
   position: fixed;
   bottom: 53px;

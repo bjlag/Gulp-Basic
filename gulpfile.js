@@ -8,6 +8,7 @@ const gulp = require( 'gulp' ),
     plumber = require('gulp-plumber'),
     del = require( 'del' ),
     sass = require( 'gulp-sass' ),
+    sassGlob = require('gulp-sass-glob'), //  корректная обработка @import вида './**/*'
     concat = require( 'gulp-concat' ),
     autoprefixer = require( 'gulp-autoprefixer' ),
     sourcemaps = require( 'gulp-sourcemaps' ),
@@ -51,7 +52,7 @@ const path = {
         ]
     },
     css: {
-        sass: './src/blocks/**/*.+(sass|scss)',
+        sass: './src/blocks/styles.sass',
         dist: './dist/assets/css',
         src: './src/assets/css',
         libs: [
@@ -141,6 +142,7 @@ gulp.task( 'css:main', () => {
     return gulp.src( path.css.sass )
         .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
+        .pipe( sassGlob() )
         .pipe( sass() )
         .pipe( concat( 'styles.min.css' ) )
         .pipe( gcmq() )
