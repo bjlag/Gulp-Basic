@@ -5,6 +5,7 @@
 //-----------------------------------------------------
 
 const gulp = require( 'gulp' ),
+    plumber = require('gulp-plumber'),
     del = require( 'del' ),
     sass = require( 'gulp-sass' ),
     concat = require( 'gulp-concat' ),
@@ -110,6 +111,7 @@ gulp.task( 'html', () => {
         distPath = (isProduction ? path.root.dist : path.root.src);
 
     return gulp.src( srcPath )
+        .pipe( plumber() )
         .pipe( gulpif( !isProduction, fileinclude() ) )
         .pipe( htmlbeautify( {
             indentSize: 4
@@ -128,6 +130,7 @@ gulp.task( 'fonts', () => {
     }
 
     return gulp.src( srcPath )
+        .pipe( plumber() )
         .pipe( gulp.dest( distPath ) );
 } );
 
@@ -136,6 +139,7 @@ gulp.task( 'css:main', () => {
         distPath = (isProduction ? path.css.dist : path.css.src);
 
     return gulp.src( path.css.sass )
+        .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( sass() )
         .pipe( concat( 'styles.min.css' ) )
@@ -164,6 +168,7 @@ gulp.task( 'css:libs', () => {
         libs = path.css.libs;
 
     return gulp.src( libs )
+        .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'vendor.min.css' ) )
         .pipe( gulpif( isProduction, minifyCss( {
@@ -188,6 +193,7 @@ gulp.task( 'js:main', () => {
         distPath = (isProduction ? path.js.dist : path.js.src);
 
     return gulp.src( path.js.code )
+        .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'main.min.js' ) )
         .pipe( gulpif( isProduction, uglify() ) )
@@ -202,6 +208,7 @@ gulp.task( 'js:libs', () => {
         libs = path.js.libs;
 
     return gulp.src( libs )
+        .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'vendor.min.js' ) )
         .pipe( gulpif( isProduction, uglify() ) )
