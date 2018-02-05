@@ -142,7 +142,12 @@ gulp.task( 'css:main', () => {
     return gulp.src( path.css.sass )
         .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
-        .pipe( sassGlob() )
+        .pipe( sassGlob( {
+                ignorePaths: [
+                    '_*.+(sass|scss)' // исключить из обработки базовые импорты
+                ]
+            } )
+        )
         .pipe( sass() )
         .pipe( concat( 'styles.min.css' ) )
         .pipe( gcmq() )
