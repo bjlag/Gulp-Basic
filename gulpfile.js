@@ -8,13 +8,15 @@ const
     // Подключаем Gulp.
     gulp = require( 'gulp' ),
     // В случае ошибки работа Gulp не прирывается. Выводится информация об ошибке.
-    plumber = require('gulp-plumber'),
+    plumber = require( 'gulp-plumber' ),
     // Удаление файлов
     del = require( 'del' ),
+    // Переименовывание файлов
+    rename = require( 'gulp-rename' ),
     // Препроцессор SASS
     sass = require( 'gulp-sass' ),
     // Нужен для корректной обработки @import вида './**/*'
-    sassGlob = require('gulp-sass-glob'),
+    sassGlob = require( 'gulp-sass-glob' ),
     // Объединение файлов
     concat = require( 'gulp-concat' ),
     // Добавление вендорных префиксов в CSS
@@ -87,7 +89,7 @@ const
             dist: './dist/assets/js',
             src: './src/assets/js',
             vendor: [
-                './src/vendor/jquery/dist/jquery.min.js',
+                './src/vendor/jquery/dist/jquery.js',
                 './src/vendor/bootstrap/dist/js/bootstrap.min.js'
             ]
         },
@@ -188,10 +190,12 @@ gulp.task( 'css:main', () => {
             } )
         )
         .pipe( sass() )
-        .pipe( concat( 'main.min.css' ) )
+        .pipe( concat( 'main.css' ) )
         .pipe( gcmq() )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
-        .pipe( gulpif( isProduction, cleanCss( {
+        .pipe( gulp.dest( distPath ) )
+
+        .pipe( cleanCss( {
                 compatibility: 'ie9',
                 level: {
                     1: {
@@ -202,9 +206,11 @@ gulp.task( 'css:main', () => {
             ( details ) => {
                 console.log( `${ details.name }: ${ details.stats.originalSize }` );
                 console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
-            } ) ) )
-        .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
+            } ) )
+        .pipe( rename( { suffix: '.min' } ) )
+        .pipe( gulpif( !isProduction, sourcemaps.write( '.' ) ) )
         .pipe( gulp.dest( distPath ) )
+
         .pipe( bs.stream() );
 } );
 
@@ -219,8 +225,11 @@ gulp.task( 'css:vendor', () => {
     return gulp.src( vendor )
         .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
-        .pipe( concat( 'vendor.min.css' ) )
-        .pipe( gulpif( isProduction, cleanCss( {
+        .pipe( concat( 'vendor.css' ) )
+        .pipe( gulp.dest( distPath ) )
+
+        .pipe( rename( { suffix: '.min' } ) )
+        .pipe( cleanCss( {
                 compatibility: 'ie9',
                 level: {
                     1: {
@@ -231,9 +240,10 @@ gulp.task( 'css:vendor', () => {
             ( details ) => {
                 console.log( `${ details.name }: ${ details.stats.originalSize }` );
                 console.log( `${ details.name }: ${ details.stats.minifiedSize }` );
-            } ) ) )
-        .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
+            } ) )
+        .pipe( gulpif( !isProduction, sourcemaps.write( '.' ) ) )
         .pipe( gulp.dest( distPath ) )
+
         .pipe( bs.stream() );
 } );
 
@@ -247,10 +257,14 @@ gulp.task( 'js:main', () => {
     return gulp.src( path.js.code )
         .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
-        .pipe( concat( 'main.min.js' ) )
-        .pipe( gulpif( isProduction, uglify() ) )
-        .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
+        .pipe( concat( 'main.js' ) )
         .pipe( gulp.dest( distPath ) )
+
+        .pipe( rename( { suffix: '.min' } ) )
+        .pipe( uglify() )
+        .pipe( gulpif( !isProduction, sourcemaps.write( '.' ) ) )
+        .pipe( gulp.dest( distPath ) )
+
         .pipe( bs.stream() );
 } );
 
@@ -265,9 +279,12 @@ gulp.task( 'js:vendor', () => {
     return gulp.src( vendor )
         .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
-        .pipe( concat( 'vendor.min.js' ) )
-        .pipe( gulpif( isProduction, uglify() ) )
-        .pipe( gulpif( !isProduction, sourcemaps.write( '/' ) ) )
+        .pipe( concat( 'vendor.js' ) )
+        .pipe( gulp.dest( distPath ) )
+
+        .pipe( rename( { suffix: '.min' } ) )
+        .pipe( uglify() )
+        .pipe( gulpif( !isProduction, sourcemaps.write( '.' ) ) )
         .pipe( gulp.dest( distPath ) );
 } );
 
