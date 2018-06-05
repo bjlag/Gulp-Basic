@@ -67,28 +67,28 @@ const
             ready: './src/assets/fonts/**/*',
             dist: './dist/assets/fonts',
             src: './src/assets/fonts',
-            libs: [
-                './src/libs/bootstrap/dist/fonts/**/*',
-                './src/libs/font-awesome/fonts/**/*'
+            vendor: [
+                './src/vendor/bootstrap/dist/fonts/**/*',
+                './src/vendor/font-awesome/fonts/**/*'
             ]
         },
         css: {
-            sass: './src/blocks/styles.sass',
+            sass: './src/blocks/main.sass',
             dist: './dist/assets/css',
             src: './src/assets/css',
-            libs: [
-                './src/libs/normalize-css/normalize.css',
-                './src/libs/bootstrap/dist/css/bootstrap.css',
-                './src/libs/font-awesome/css/font-awesome.css'
+            vendor: [
+                './src/vendor/normalize-css/normalize.css',
+                './src/vendor/bootstrap/dist/css/bootstrap.css',
+                './src/vendor/font-awesome/css/font-awesome.css'
             ]
         },
         js: {
             code: './src/blocks/**/*.js',
             dist: './dist/assets/js',
             src: './src/assets/js',
-            libs: [
-                './src/libs/jquery/dist/jquery.min.js',
-                './src/libs/bootstrap/dist/js/bootstrap.min.js'
+            vendor: [
+                './src/vendor/jquery/dist/jquery.min.js',
+                './src/vendor/bootstrap/dist/js/bootstrap.min.js'
             ]
         },
         images: {
@@ -130,6 +130,13 @@ gulp.task( 'clean:cache', ( done ) => {
 } );
 
 /**
+ * Удаление Favicons
+ */
+gulp.task( 'clean:favicon', () => {
+    return del( [ path.favicons.src, path.favicons.ready ] );
+} );
+
+/**
  * Сборка HTML
  */
 gulp.task( 'html', () => {
@@ -156,7 +163,7 @@ gulp.task( 'fonts', () => {
         distPath = (isProduction ? path.fonts.dist : path.fonts.src);
 
     if ( !isProduction ) {
-        srcPath = path.fonts.libs;
+        srcPath = path.fonts.vendor;
     }
 
     return gulp.src( srcPath )
@@ -181,7 +188,7 @@ gulp.task( 'css:main', () => {
             } )
         )
         .pipe( sass() )
-        .pipe( concat( 'styles.min.css' ) )
+        .pipe( concat( 'main.min.css' ) )
         .pipe( gcmq() )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
         .pipe( gulpif( isProduction, cleanCss( {
@@ -204,12 +211,12 @@ gulp.task( 'css:main', () => {
 /**
  * Сборка вендорных CSS
  */
-gulp.task( 'css:libs', () => {
+gulp.task( 'css:vendor', () => {
     let isProduction = argv.prod,
         distPath = (isProduction ? path.css.dist : path.css.src),
-        libs = path.css.libs;
+        vendor = path.css.vendor;
 
-    return gulp.src( libs )
+    return gulp.src( vendor )
         .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'vendor.min.css' ) )
@@ -250,12 +257,12 @@ gulp.task( 'js:main', () => {
 /**
  * Сборка вендорных JS
  */
-gulp.task( 'js:libs', () => {
+gulp.task( 'js:vendor', () => {
     let isProduction = argv.prod,
         distPath = (isProduction ? path.js.dist : path.js.src),
-        libs = path.js.libs;
+        vendor = path.js.vendor;
 
-    return gulp.src( libs )
+    return gulp.src( vendor )
         .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'vendor.min.js' ) )
@@ -265,39 +272,45 @@ gulp.task( 'js:libs', () => {
 } );
 
 /**
- * Запуск автоперезагрузки браузера и отслеживания изменений файлов
+ * Оптимизация изображений
  */
-gulp.task( 'browser-sync', () => {
-    if ( argv.prod ) {
-        console.log( 'Продакшен, задача отменена' );
-        return false;
-    }
-
-    bs.init( {
-        server: {
-            baseDir: path.root.src
-        },
-        notify: false
-    } );
-
-    watch( path.watch.html, () => gulp.start( 'html' ) );
-    watch( path.watch.sass, () => gulp.start( 'css:main' ) );
-    watch( path.watch.js, () => gulp.start( 'js:main' ) );
-    watch( path.watch.reload, bs.reload );
-} );
-
-
-/**
- * Удаление Favicons
- */
-gulp.task( 'favicon:clean', () => {
-    return del( [ path.favicons.src, path.favicons.ready ] );
+gulp.task( 'images', () => {
+    return gulp.src( path.images.src )
+        .pipe( cache(
+            imagemin(
+                [
+                    imagemin.gifsicle( {
+                        interlaced: true
+                    } ),
+                    imagemin.jpegtran( {
+                        progressive: true
+                    } ),
+                    imageminJpeg( {
+                        loops: 5,
+                        min: 75,
+                        max: 80,
+                        quality: 'high'
+                    } ),
+                    imagemin.svgo(),
+                    imagemin.optipng( {
+                        optimizationLevel: 3
+                    } ),
+                    imageminPng( {
+                        speed: 5
+                    } )
+                ],
+                {
+                    verbose: true
+                }
+            )
+        ) )
+        .pipe( gulp.dest( path.images.dist ) );
 } );
 
 /**
  * Сборка Favicons
  */
-gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
+gulp.task( 'favicon:generate', [ 'clean:favicon' ], () => {
     gulp.src( path.favicons.master )
         .pipe( favicons( {
             appName: null,                  // Your application's name. `string`
@@ -345,39 +358,25 @@ gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
 } );
 
 /**
- * Оптимизация изображений
+ * Запуск автоперезагрузки браузера и отслеживания изменений файлов
  */
-gulp.task( 'images', () => {
-    return gulp.src( path.images.src )
-        .pipe( cache(
-            imagemin(
-                [
-                    imagemin.gifsicle( {
-                        interlaced: true
-                    } ),
-                    imagemin.jpegtran( {
-                        progressive: true
-                    } ),
-                    imageminJpeg( {
-                        loops: 5,
-                        min: 75,
-                        max: 80,
-                        quality: 'high'
-                    } ),
-                    imagemin.svgo(),
-                    imagemin.optipng( {
-                        optimizationLevel: 3
-                    } ),
-                    imageminPng( {
-                        speed: 5
-                    } )
-                ],
-                {
-                    verbose: true
-                }
-            )
-        ) )
-        .pipe( gulp.dest( path.images.dist ) );
+gulp.task( 'browser-sync', () => {
+    if ( argv.prod ) {
+        console.log( 'Продакшен, задача отменена' );
+        return false;
+    }
+
+    bs.init( {
+        server: {
+            baseDir: path.root.src
+        },
+        notify: false
+    } );
+
+    watch( path.watch.html, () => gulp.start( 'html' ) );
+    watch( path.watch.sass, () => gulp.start( 'css:main' ) );
+    watch( path.watch.js, () => gulp.start( 'js:main' ) );
+    watch( path.watch.reload, bs.reload );
 } );
 
 /**
@@ -385,7 +384,7 @@ gulp.task( 'images', () => {
  * gulp build --prod (продакшен)
  * gulp build (разработка)
  */
-gulp.task( 'build', [ 'html', 'fonts', 'css:main', 'css:libs', 'js:main', 'js:libs', ], () => {
+gulp.task( 'build', [ 'html', 'fonts', 'css:main', 'css:vendor', 'js:main', 'js:vendor', ], () => {
     if ( argv.prod ) {
         gulp.start( 'images' );
     } else {
