@@ -1,5 +1,5 @@
 {
-  "name": "personal_kadri_lend",
+  "name": "Gulp Basic",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -34,6 +34,6 @@
     "prod": "gulp build --prod",
     "dev": "gulp build"
   },
-  "author": "",
+  "author": "Vlad Duplin",
   "license": "ISC"
 }
