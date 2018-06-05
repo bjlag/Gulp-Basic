@@ -1,111 +1,137 @@
 'use strict';
 
 //-----------------------------------------------------
-// Libraries
+// Подключение плагинов
 //-----------------------------------------------------
 
-const gulp = require( 'gulp' ),
+const
+    // Подключаем Gulp.
+    gulp = require( 'gulp' ),
+    // В случае ошибки работа Gulp не прирывается. Выводится информация об ошибке.
     plumber = require('gulp-plumber'),
+    // Удаление файлов
     del = require( 'del' ),
+    // Препроцессор SASS
     sass = require( 'gulp-sass' ),
-    sassGlob = require('gulp-sass-glob'), //  корректная обработка @import вида './**/*'
+    // Нужен для корректной обработки @import вида './**/*'
+    sassGlob = require('gulp-sass-glob'),
+    // Объединение файлов
     concat = require( 'gulp-concat' ),
+    // Добавление вендорных префиксов в CSS
     autoprefixer = require( 'gulp-autoprefixer' ),
+    // Постороение Sourcemaps
     sourcemaps = require( 'gulp-sourcemaps' ),
-    minifyCss = require( 'gulp-clean-css' ),
+    // Подключение файлов
     fileinclude = require( 'gulp-file-include' ),
+    // Генерация Favicons
     favicons = require( 'gulp-favicons' ),
-    uglify = require( 'gulp-uglify' ),
+    // Группировка медиа запросов CSS
     gcmq = require( 'gulp-group-css-media-queries' ),
+    // Автоперезагрузка страницы в браузере при изменениях отслеживаемых файлов
     bs = require( 'browser-sync' ).create(),
+    // Мониторинг изменений
     watch = require( 'gulp-watch' ),
+    // Для запуска плагинов при определенных условиях приямо в потоке
     gulpif = require( 'gulp-if' ),
+    // Форматирование HTML файлов
     htmlbeautify = require( 'gulp-html-beautify' ),
+    // Оптимизация CSS
+    cleanCss = require( 'gulp-clean-css' ),
+    // Оптимизация JS
+    uglify = require( 'gulp-uglify' ),
+    // Оптимизация изображений
     imagemin = require( 'gulp-imagemin' ),
     imageminJpeg = require( 'imagemin-jpeg-recompress' ),
     imageminPng = require( 'imagemin-pngquant' ),
-    runSequence = require( 'run-sequence' ),
+    // Работа с кешем
     cache = require( 'gulp-cache' ),
+    // Получение параметров из командной строки
     argv = require( 'yargs' ).argv;
 
 
 //-----------------------------------------------------
-// Setting
+// Настройки проекта
 //-----------------------------------------------------
 
-const path = {
-    root: {
-        dist: './dist',
-        src: './src'
-    },
-    html: {
-        ready: './src/*.html',
-        tpl: './src/html/pages/*.html'
-    },
-    fonts: {
-        ready: './src/assets/fonts/**/*',
-        dist: './dist/assets/fonts',
-        src: './src/assets/fonts',
-        libs: [
-            './src/libs/bootstrap/dist/fonts/**/*',
-            './src/libs/font-awesome/fonts/**/*'
-        ]
-    },
-    css: {
-        sass: './src/blocks/styles.sass',
-        dist: './dist/assets/css',
-        src: './src/assets/css',
-        libs: [
-            './src/libs/normalize-css/normalize.css',
-            './src/libs/bootstrap/dist/css/bootstrap.css',
-            './src/libs/font-awesome/css/font-awesome.css'
-        ]
-    },
-    js: {
-        code: './src/blocks/**/*.js',
-        dist: './dist/assets/js',
-        src: './src/assets/js',
-        libs: [
-            './src/libs/jquery/dist/jquery.min.js',
-            './src/libs/bootstrap/dist/js/bootstrap.min.js'
-        ]
-    },
-    images: {
-        src: './src/assets/images/**/*',
-        dist: './dist/assets/images'
-    },
-    favicons: {
-        ready: './src/assets/images/favicons',
-        master: './src/favicons/favicon-master.png',
-        src: './src/favicons/icons',
-        html: '../../html/includes/favicons.html',
-        path: 'assets/images/favicons'
-    },
-    watch: {
-        html: './src/html/**/*.html',
-        sass: './src/blocks/**/*.+(sass|scss)',
-        js: './src/blocks/**/*.js',
-        reload: './src/*.html'
-    }
-};
+const
+    path = {
+        root: {
+            dist: './dist',
+            src: './src'
+        },
+        html: {
+            ready: './src/*.html',
+            tpl: './src/html/pages/*.html'
+        },
+        fonts: {
+            ready: './src/assets/fonts/**/*',
+            dist: './dist/assets/fonts',
+            src: './src/assets/fonts',
+            libs: [
+                './src/libs/bootstrap/dist/fonts/**/*',
+                './src/libs/font-awesome/fonts/**/*'
+            ]
+        },
+        css: {
+            sass: './src/blocks/styles.sass',
+            dist: './dist/assets/css',
+            src: './src/assets/css',
+            libs: [
+                './src/libs/normalize-css/normalize.css',
+                './src/libs/bootstrap/dist/css/bootstrap.css',
+                './src/libs/font-awesome/css/font-awesome.css'
+            ]
+        },
+        js: {
+            code: './src/blocks/**/*.js',
+            dist: './dist/assets/js',
+            src: './src/assets/js',
+            libs: [
+                './src/libs/jquery/dist/jquery.min.js',
+                './src/libs/bootstrap/dist/js/bootstrap.min.js'
+            ]
+        },
+        images: {
+            src: './src/assets/images/**/*',
+            dist: './dist/assets/images'
+        },
+        favicons: {
+            ready: './src/assets/images/favicons',
+            master: './src/favicons/favicon-master.png',
+            src: './src/favicons/icons',
+            html: '../../html/includes/favicons.html',
+            path: 'assets/images/favicons'
+        },
+        watch: {
+            html: './src/html/**/*.html',
+            sass: './src/blocks/**/*.+(sass|scss)',
+            js: './src/blocks/**/*.js',
+            reload: './src/*.html'
+        }
+    };
 
 
 //-----------------------------------------------------
-// Tasks
+// Задачи проекта
 //-----------------------------------------------------
 
 /**
- * Dev tasks
+ * Очистить папку dist
  */
-
 gulp.task( 'clean:dist', () => {
     return del( path.root.dist );
 } );
 
+/**
+ * Очистить кеш
+ */
 gulp.task( 'clean:cache', ( done ) => {
     return cache.clearAll( done );
 } );
 
+/**
+ * Сборка HTML
+ */
 gulp.task( 'html', () => {
     let isProduction = argv.prod,
         srcPath = (isProduction ? path.html.ready : path.html.tpl),
@@ -121,6 +147,9 @@ gulp.task( 'html', () => {
         .pipe( bs.stream() );
 } );
 
+/**
+ * Копирование шрифтов
+ */
 gulp.task( 'fonts', () => {
     let isProduction = argv.prod,
         srcPath = path.fonts.ready,
@@ -135,6 +164,9 @@ gulp.task( 'fonts', () => {
         .pipe( gulp.dest( distPath ) );
 } );
 
+/**
+ * Сборка основных CSS
+ */
 gulp.task( 'css:main', () => {
     let isProduction = argv.prod,
         distPath = (isProduction ? path.css.dist : path.css.src);
@@ -152,7 +184,7 @@ gulp.task( 'css:main', () => {
         .pipe( concat( 'styles.min.css' ) )
         .pipe( gcmq() )
         .pipe( autoprefixer( { browsers: [ 'last 15 versions', '> 0.1%' ] } ) )
-        .pipe( gulpif( isProduction, minifyCss( {
+        .pipe( gulpif( isProduction, cleanCss( {
                 compatibility: 'ie9',
                 level: {
                     1: {
@@ -169,6 +201,9 @@ gulp.task( 'css:main', () => {
         .pipe( bs.stream() );
 } );
 
+/**
+ * Сборка вендорных CSS
+ */
 gulp.task( 'css:libs', () => {
     let isProduction = argv.prod,
         distPath = (isProduction ? path.css.dist : path.css.src),
@@ -178,7 +213,7 @@ gulp.task( 'css:libs', () => {
         .pipe( plumber() )
         .pipe( gulpif( !isProduction, sourcemaps.init() ) )
         .pipe( concat( 'vendor.min.css' ) )
-        .pipe( gulpif( isProduction, minifyCss( {
+        .pipe( gulpif( isProduction, cleanCss( {
                 compatibility: 'ie9',
                 level: {
                     1: {
@@ -195,6 +230,9 @@ gulp.task( 'css:libs', () => {
         .pipe( bs.stream() );
 } );
 
+/**
+ * Сборка основного JS
+ */
 gulp.task( 'js:main', () => {
     let isProduction = argv.prod,
         distPath = (isProduction ? path.js.dist : path.js.src);
@@ -209,6 +247,9 @@ gulp.task( 'js:main', () => {
         .pipe( bs.stream() );
 } );
 
+/**
+ * Сборка вендорных JS
+ */
 gulp.task( 'js:libs', () => {
     let isProduction = argv.prod,
         distPath = (isProduction ? path.js.dist : path.js.src),
@@ -223,6 +264,9 @@ gulp.task( 'js:libs', () => {
         .pipe( gulp.dest( distPath ) );
 } );
 
+/**
+ * Запуск автоперезагрузки браузера и отслеживания изменений файлов
+ */
 gulp.task( 'browser-sync', () => {
     if ( argv.prod ) {
         console.log( 'Продакшен, задача отменена' );
@@ -242,14 +286,17 @@ gulp.task( 'browser-sync', () => {
     watch( path.watch.reload, bs.reload );
 } );
 
-/**
- * Favicons
- */
 
+/**
+ * Удаление Favicons
+ */
 gulp.task( 'favicon:clean', () => {
     return del( [ path.favicons.src, path.favicons.ready ] );
 } );
 
+/**
+ * Сборка Favicons
+ */
 gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
     gulp.src( path.favicons.master )
         .pipe( favicons( {
@@ -298,9 +345,8 @@ gulp.task( 'favicon:generate', [ 'favicon:clean' ], () => {
 } );
 
 /**
- * Production tasks
+ * Оптимизация изображений
  */
-
 gulp.task( 'images', () => {
     return gulp.src( path.images.src )
         .pipe( cache(
@@ -335,10 +381,7 @@ gulp.task( 'images', () => {
 } );
 
 /**
- * Main tasks
- */
-
-/**
+ * Сборка проекта
  * gulp build --prod (продакшен)
  * gulp build (разработка)
  */
