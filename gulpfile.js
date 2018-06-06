@@ -85,7 +85,11 @@ const
             ]
         },
         js: {
-            code: './src/blocks/**/*.js',
+            code: [
+                './src/html/glob_vars.js',
+                './src/blocks/**/*.js',
+                './src/html/main.js'
+            ],
             dist: './dist/assets/js',
             src: './src/assets/js',
             vendor: [
