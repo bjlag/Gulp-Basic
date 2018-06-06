@@ -57,14 +57,14 @@ const
 
 const
     path = {
-        root: {
-            dist: './dist',
-            src: './src'
-        },
+        dist: './dist',
+        src: './src',
+
         html: {
             ready: './src/*.html',
-            tpl: './src/html/pages/*.html'
+            tmpl: './src/html/pages/*.html'
         },
+
         fonts: {
             ready: './src/assets/fonts/**/*',
             dist: './dist/assets/fonts',
@@ -74,6 +74,7 @@ const
                 './src/vendor/font-awesome/fonts/**/*'
             ]
         },
+
         css: {
             sass: './src/blocks/main.sass',
             dist: './dist/assets/css',
@@ -84,6 +85,7 @@ const
                 './src/vendor/font-awesome/css/font-awesome.css'
             ]
         },
+
         js: {
             code: [
                 './src/html/glob_vars.js',
@@ -97,10 +99,12 @@ const
                 './src/vendor/bootstrap/dist/js/bootstrap.min.js'
             ]
         },
+
         images: {
             src: './src/assets/images/**/*',
             dist: './dist/assets/images'
         },
+
         favicons: {
             ready: './src/assets/images/favicons',
             master: './src/favicons/favicon-master.png',
@@ -108,6 +112,7 @@ const
             html: '../../html/includes/favicons.html',
             path: 'assets/images/favicons'
         },
+
         watch: {
             html: './src/html/**/*.html',
             sass: './src/blocks/**/*.+(sass|scss)',
@@ -125,7 +130,7 @@ const
  * Очистить папку dist
  */
 gulp.task( 'clean:dist', () => {
-    return del( path.root.dist );
+    return del( path.dist );
 } );
 
 /**
@@ -147,8 +152,8 @@ gulp.task( 'clean:favicon', () => {
  */
 gulp.task( 'html', () => {
     let isProduction = argv.prod,
-        srcPath = (isProduction ? path.html.ready : path.html.tpl),
-        distPath = (isProduction ? path.root.dist : path.root.src);
+        srcPath = (isProduction ? path.html.ready : path.html.tmpl),
+        distPath = (isProduction ? path.dist : path.src);
 
     return gulp.src( srcPath )
         .pipe( plumber() )
@@ -389,7 +394,7 @@ gulp.task( 'browser-sync', () => {
 
     bs.init( {
         server: {
-            baseDir: path.root.src
+            baseDir: path.src
         },
         notify: false
     } );
