@@ -1,84 +1,135 @@
-# Gulp HTML
+# Gulp Basic
 
-## Команды
+Базовый проект для разработки front-end, включающий в себя:
 
-### Старт
+* Gulp 3
+* Bower
+* Bootstrap 3
+* jQuery
+* Normalize CSS
+* Font Awesome
+* SASS
+* Autoprefixer
+* Минификатор JS, CSS
+* Оптимизатор изображений
+* Генератор favicons
+* Browsersync
 
-Установка плагинов Gulp
-```bash
-npm install
+## Структура проекта
+
+```
+├── dist/                           # Продакшен, команда gulp build --prod.
+├── src/                            # Все ресурсы проекта.
+│   ├── assets/                     # Обработанный CSS и JS, шрифты, картинки.
+│   │   ├── css/  
+│   │   ├── fonts/  
+│   │   ├── images/  
+│   │   └── js/  
+│   ├── blocks/                     # SASS, исходный JS.
+│   │   ├── block-one/              # Блок.
+│   │   │   ├── block-one.sass
+│   │   │   └── block-one.js
+│   │   ├── block-two/
+│   │   ├── _base.sass              # Базовые стили, которые должны быть в самом верху.
+│   │   ├── _fonts.scss             # Импорт шрифтов.
+│   │   ├── _var.scss               # Определяем переменные.
+│   │   └── main.sass               # Главный SASS. Импортирует в себя другие блоки.
+│   ├── favicons/                   # Ресурсы для генерации favicons.
+│   │   ├── icons/                  # Иконки после генерации.
+│   │   └── favicon-master.png      # Донер, из которого генерятся иконки.
+│   ├── html/                       # HTML проекта.
+│   │   ├── includes/               # Типовые блоки, которые подключаются в pages.
+│   │   ├── layouts/                # Шаблоны страниц (пока не используется).
+│   │   ├── pages/                  # Уникальные страницы.
+│   │   ├── glob_vars.js            # Объявление глобальной переменной app.
+│   │   └── main.js                 # Инициализация приложения.
+│   ├── vendor/                     # Внешние библиотеки. Сюда же ставит Bower.
+│   └── *.html                      # Готовый HTML, генерится в корень src.
+├── .bowerrc
+├── bower.json
+├── gulpfile.js
+└── package.json
 ```
 
-Установка библиотек
+## Старт
+
+1. Глобальная установка Gulp:
+    ```bash
+    npm install --global gulp-cli
+    ```
+
+2. Установка зависимостей из файла `package.json`:
+    ```bash
+    npm install
+    ```
+
+3. Установка библиотек:
+    ```bash
+    bower install 
+    ```
+
+## Разработка
+
+Вводим команду:
 ```bash
-bower install 
+gulp build
+```
+Запустится задача `build` в режиме разработчика: 
+
+* Поднимется `browser-sync`. Сайт будет доступен в браузере по адресу `localhost:3000`.
+* Будут отслеживаться изменения в HTML, SASS и JS. При изменениях будет автоматически обновляться страница в браузере. 
+* У CSS и JS будет строиться sourcemap.
+* CSS и JS создаются в минифицированном и несжатом виде.
+
+**Разовая сборка HTML:** 
+```bash
+gulp html
 ```
 
-### Development
-
+**Разовая сборка CSS:**
 ```bash
-npm run build
+gulp css:main       # для сборки основных стилей
+gulp css:vendor     # для сборки вендорных стилей
 ```
-Запускается задача build в режиме __development__. 
-
-Поднимается сервер с `browser-sync`. JS и CSS не минифицируются, комментарии не удаляются, строится sourcemap.
-
-### Production
-
+ 
+**Разовая сборка JS:**
 ```bash
-npm run build --prod
+gulp js:main       # для сборки основных скриптов
+gulp js:vendor     # для сборки вендорных скриптов
 ```
-Запускается задача build в режиме __productions__. 
 
-Все файлы сайта переносятся в папку `dist`. JS и CSS минифицируются, комментарии и sourcemap удаляются, изображения сжимаются. 
+**Разовая сборка шрифтов:**
+```bash
+gulp fonts
+```
 
-## Структура папок
+## Продакшен
 
-* dist
-    * assets  
-        * css  
-        * fonts  
-        * images  
-        * js
-    * *.html  
-* src
-    * assets  
-        * css  
-        * fonts  
-        * images  
-        * js  
-    * blocks
-    * favicons
-    * html
-        * includes
-        * layouts
-        * pages
-    * libs  
-    * *.html
-* .bowerrc
-* bower.json
-* gulpfile.js
-* package.json
+Вводим команду:
+```bash
+gulp build --prod
+```
+Запустится задача `build` в режиме продакшена:  
 
----
+* Готовый HTML перенесется в корень папки `/dist`.
+* У сгенерированного CSS и JS не строиться sourcemap.
+* Все изображения из папки `/src/assets/images` оптимизируются и переносятся в `/dist/assets/images`. Исходные файлы в `/src/assets/images` не меняются.
+* Все шрифты, JS, CSS генерятся в папку `/dist/assets`. 
+* CSS и JS создаются в минифицированном и несжатом виде.
 
-* __dist__  
-Продакшен.
-* __src__  
-Исходные материалы проекта, вся работа ведется здесь.
-* __src/assets__  
-Все необходимое для работы сайта собирается сюда, кроме HTML.
-* __src/blocks__  
-SASS и JS.
-* __src/favicons__  
-Все для генерации favicons.
-* __src/html__  
-Шаблоны для генерации HTML. Готовый HTML падает в корень папки `src`.
-* __src/html/includes__  
-Повторно используемые блоки. Например, head, header, footer.
-* __src/html/layouts__  
-На будущее. Шаблоны страниц.
-* __src/html/pages__  
-Сами страницы, которые верстаются.
-* __src/libs__  
-Все используемые библиотеки, например, jQuery, Bootstrap и пр.
+Если надо удалить папку dist выполните команду:
+```bash
+gulp clean:dist
+```
+
+Для ускорения повторной оптимизации изображений - результат кешируется. Чтобы очистить кеш, выполните команду:
+```bash
+gulp clean:cache
+```
+
+Если нужно только оптимизировать изображения для продакшена, выполните команду:
+```bash
+gulp images
+```
+
+## Генерация favicon
