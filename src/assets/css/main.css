@@ -2,7 +2,7 @@ body {
   font-family: "Roboto", sans-serif;
   font-size: 15px;
   line-height: 1.8;
-  color: #090909;
+  color: #fff;
 }
 
 input:focus:required:invalid,
@@ -19,7 +19,7 @@ textarea:focus:required:valid {
 *:-moz-placeholder,
 *::-moz-placeholder,
 *:-ms-input-placeholder {
-  color: #6f6f6f;
+  color: white;
   opacity: 1;
 }
 

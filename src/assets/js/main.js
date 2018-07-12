@@ -2,9 +2,15 @@
 
 var app = {};
 
-app.init = function() {
+$( function () {
     console.log( 'in main.js' );
-};
+
+    app.gotoTop.init( {
+        buttonId: '#goto-top',
+        classShow: 'goto-top--show',
+        scrollSize: 200
+    } );
+} );
 
 ;( function ( obj ) {
     var gotoTop = {};
@@ -35,11 +41,3 @@ app.init = function() {
 
     obj.gotoTop = gotoTop;
 } )( app );
-$( function () {
-    app.init();
-    app.gotoTop.init( {
-        buttonId: '#goto-top',
-        classShow: 'goto-top--show',
-        scrollSize: 200
-    } );
-} );
