@@ -24,6 +24,9 @@ gulp-basic/
 │   ├── images/  
 │   ├── js/
 │   └── *.html  
+├── gulp/                           # Скрипты для работы задач Gulp.
+│   ├── paths.js                    # Конфиг.
+│   └── tasks.js                    # Задачи.
 ├── src/                            # Все ресурсы приложения.
 │   ├── assets/                     # Готовые HTML, CSS, JS, шрифты, картинки.
 │   │   ├── css/  
@@ -41,7 +44,7 @@ gulp-basic/
 │   │   ├── _glob_vars.js           # Объявление глобальной переменной app.
 │   │   ├── _main.js                # Инициализация приложения.
 │   │   └── *.js                    
-│   ├── sass/                     # SASS.
+│   ├── sass/                       # SASS.
 │   │   ├── block-one/              # Блок.
 │   │   │   ├── block-one-1.sass
 │   │   │   └── block-one-2.sass
