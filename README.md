@@ -139,10 +139,10 @@ $ gulp clean:cache
 ## Генерация favicons
 
 1. Подготовьте донора (мастер изображение), из которого будут создаваться иконки, и положите донора в папку `./src/favicons` с именем `favicon-master.png`.
-2. В задаче `favicon:generate` укажите необходимые настройки, например, какие иконки надо создать (`ключ icons`).
+2. В задаче `favicons` укажите необходимые настройки, например, какие иконки надо создать (`ключ icons`).
 3. Выполните команду:
     ```bash
-    $ gulp favicons:generate
+    $ gulp favicons
     ```
     
 В результате:
@@ -159,7 +159,7 @@ $ gulp clean:cache
 $ gulp clean:favicons
 ```
 
-Задача `clean:favicons` всегда выполняется перед задачей `favicons:generate`.
+Задача `clean:favicons` всегда выполняется перед задачей `favicons`.
 
 ## Полезные задачи
 
@@ -168,7 +168,7 @@ $ gulp build                # Разработка приложения
 $ gulp prod                 # Продакшен приложения
 $ gulp clean:dist           # Удаление папки dist
 $ gulp clean:cache          # Очистка кеша
-$ clean:favicons            # Удаление сгенерированных favicons
+$ gulp clean:favicons       # Удаление сгенерированных favicons
 $ gulp images               # Оптимизация изображений
 $ gulp html                 # Соборка HTML
 $ gulp css:main             # Собрка сновных стилей
@@ -176,6 +176,7 @@ $ gulp css:vendor           # Сборка вендорных стилей
 $ gulp js:main              # Сборка основных скриптов
 $ gulp js:vendor            # Сборка вендорных скриптов
 $ gulp fonts                # Копирование вендорных шрифтов
+$ gulp favicons             # Генерация favicons
 ```
 
 ## Пакеты Gulp
