@@ -43,6 +43,13 @@ tasks.cleanFavicons = function() {
 };
 
 /**
+ * Удаление спрайста
+ */
+tasks.cleanSprite = function () {
+    return del( paths.sprite.ready + '/*.*' );
+};
+
+/**
  * Сборка HTML
  */
 tasks.html = function() {
@@ -263,6 +270,29 @@ tasks.faviconGenerate = function() {
         } ) )
         .pipe( plugins.if( '*.+(ico|png|svg|xml)', gulp.dest( paths.favicons.ready ) ) )
         .pipe( gulp.dest( paths.favicons.src ) );
+};
+
+/**
+ * Генарация спрайта
+ */
+tasks.sprite = function () {
+    return gulp.src( paths.sprite.icons )
+        .pipe( plugins.spritesmith( {
+            imgName: 'sprite.png',
+            cssName: 'sprite.sass',
+            padding: 15,
+            imgPath: '../images/sprite.png',
+            cssTemplate: './src/sprite/templates/sass.template.handlebars'
+        } ) )
+        .pipe( gulp.dest( paths.sprite.ready ) );
+};
+
+/**
+ * Копируем готовый спрайт в assets/images
+ */
+tasks.spriteCopy = function () {
+    return gulp.src( paths.sprite.ready + '/sprite.png' )
+        .pipe( gulp.dest( './src/assets/images' ) );
 };
 
 /**

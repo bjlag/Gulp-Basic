@@ -57,6 +57,11 @@ const paths = {
         path: 'images/favicons'
     },
 
+    sprite: {
+        icons: './src/sprite/icons/*.*',
+        ready: './src/sprite'
+    },
+
     watch: {
         html: './src/html/**/*.html',
         sass: './src/sass/**/*.+(sass|scss)',

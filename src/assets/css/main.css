@@ -23,6 +23,83 @@ textarea:focus:required:valid {
   opacity: 1;
 }
 
+.sp {
+  display: inline-block;
+  background-image: url(../images/sprite.png);
+}
+
+.sp--alarm {
+  background-position: -225px -106px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--cafe {
+  background-position: -204px 0px;
+  width: 87px;
+  height: 91px;
+}
+
+.sp--chair {
+  background-position: -102px 0px;
+  width: 87px;
+  height: 91px;
+}
+
+.sp--cleaning-2 {
+  background-position: 0px -106px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--cleaning {
+  background-position: -75px -106px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--insurance {
+  background-position: -150px -106px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--lamp {
+  background-position: -306px 0px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--lock {
+  background-position: 0px -181px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--percent {
+  background-position: -75px -181px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--technic {
+  background-position: -150px -181px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--trash {
+  background-position: -225px -181px;
+  width: 60px;
+  height: 60px;
+}
+
+.sp--truck {
+  background-position: 0px 0px;
+  width: 87px;
+  height: 91px;
+}
+
 .goto-top {
   position: fixed;
   bottom: 53px;
