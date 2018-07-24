@@ -1,18 +1,24 @@
-# Gulp Basic
+# Basic Web Dev
 
-Базовое окружение для разработки front-end.
+Базовое окружение для разработки веб-приложения.
 
+**Состав:**
 * Gulp 4
-* SASS
-* Autoprefixer
-* Минификатор JS, CSS
-* Оптимизатор изображений
-* Генератор favicons
-* Browsersync
-* Bootstrap 4
-* jQuery 
+* Docker
+* jQuery 3.3.1
+* Bootstrap 4.1.1
 * Popper.js 
 * Font Awesome Free
+
+**Возможности:**
+* Автоперезагрузка браузера.
+* Препроцессор SASS.
+* Автоматическая подстановка вендорных префиксов.
+* Минификация JS и CSS.
+* Генератор favicons.
+* Генератор CSS-спрайта.
+* Оптимизация изображений.
+* Docker для работы с back-end (Nginx, PHP, MySQL, sSMTP, Xdebug, phpMyAdmin).
 
 ## Структура окружения
 
@@ -23,8 +29,9 @@ gulp-basic/
 │   ├── fonts/  
 │   ├── images/  
 │   ├── js/
-│   └── *.html  
-├── gulp/                           # Скрипты для работы задач Gulp.
+│   └── *.html
+├── docker/                         # Конфигурация контейнеров.  
+├── gulp/                           # Скрипты для Gulp.
 │   ├── paths.js                    # Конфиг.
 │   └── tasks.js                    # Задачи.
 ├── src/                            # Все ресурсы приложения.
@@ -56,6 +63,12 @@ gulp-basic/
 │   ├── sass_vendor/                # SASS внешних библиотек.
 │   │   ├── bootstrap/             
 │   │   └── fontawesome/
+│   └── sprite/                     # CSS-спрайт.
+│       ├── icons/                  # Иконки, из которых создается спрайт.         
+│       ├── templates/              # Шаблоны для генерации стилевых таблиц.
+│       ├── sprite.png              # Готовый спрайт.
+│       └── sprite.sass             # Готовые стили.
+├── docker-compose.yml
 ├── gulpfile.js
 ├── package.json
 └── package-lock.json
@@ -64,12 +77,12 @@ gulp-basic/
 ## Установка
 
 1. Глобальная установка Gulp:
-    ```bash
+    ```
     $ npm install --global gulp-cli
     ```
 
 2. Установка зависимостей из файла `package.json`:
-    ```bash
+    ```
     $ npm install
     ```
 
@@ -86,7 +99,7 @@ gulp-basic/
 ## Разработка
 
 Вводим команду:
-```bash
+```
 $ gulp build
 ```
 
@@ -124,7 +137,7 @@ $ gulp build
 ## Продакшен
 
 Вводим команду:
-```bash
+```
 $ gulp prod
 ```
 
@@ -135,7 +148,7 @@ $ gulp prod
 * CSS и JS создаются в минифицированном и несжатом виде.
 
 Для ускорения повторной оптимизации изображений, результат предыдущей оптимизации кешируется. Чтобы очистить кеш, выполните команду:
-```bash
+```
 $ gulp clean:cache
 ```
 
@@ -144,7 +157,7 @@ $ gulp clean:cache
 1. Подготовьте донора (мастер изображение), из которого будут создаваться иконки, и положите донора в папку `./src/favicons` с именем `favicon-master.png`.
 2. В задаче `favicons` укажите необходимые настройки, например, какие иконки надо создать (`ключ icons`).
 3. Выполните команду:
-    ```bash
+    ```
     $ gulp favicons
     ```
     
@@ -158,20 +171,58 @@ $ gulp clean:cache
     ```
     
 **Для удаления иконок выполните команду:**
-```bash
+```
 $ gulp clean:favicons
 ```
 
 Задача `clean:favicons` всегда выполняется перед задачей `favicons`.
 
+## Генерация CCS-спрайта
+
+1. Положить иконки, для которых надо сгенерировать спрайт, в папку `./src/sprite/icons`.
+2. Запустить задачу `sprite`.
+3. В корне папки `./src/sprite` появятся два файла: 
+    * sprite.png - иконки
+    * sprite.sass - переменные и миксины для генерации иконок
+4. В файле `./src/sass/_sp.sass` подключен миксин для генерации стилей.
+
+Задача `sprite:copy` копирует sprite.png в `./src/assets/images`.  
+Задача `clean:sprite` удаляет **все файлы**, которые находятся **только в корне** `./src/sprite`. Вложенные папки не затрагиваются.
+
+Имя файла иконки подставляется в название класса.  
+alarm.png -> sp--alarm
+
+В результате получится один базовый класс:
+```css
+.sp {
+    display: inline-block;
+    background-image: url(../images/sprite.png);
+}
+```
+
+И классы отдельных иконок:
+```css
+.sp--alarm {
+    background-position: -225px -106px;
+    width: 60px;
+    height: 60px;
+}
+```
+
+Использование:
+```html
+<div class="sp sp--alarm"></div>
+```
+
 ## Полезные задачи
 
-```bash
+```
 $ gulp build                # Разработка приложения
 $ gulp prod                 # Продакшен приложения
 $ gulp clean:dist           # Удаление папки dist
 $ gulp clean:cache          # Очистка кеша
 $ gulp clean:favicons       # Удаление сгенерированных favicons
+$ gulp clean:sprite         # Удаление сгенерированного спрайта
 $ gulp images               # Оптимизация изображений
 $ gulp html                 # Соборка HTML
 $ gulp css:main             # Собрка сновных стилей
@@ -180,6 +231,8 @@ $ gulp js:main              # Сборка основных скриптов
 $ gulp js:vendor            # Сборка вендорных скриптов
 $ gulp fonts                # Копирование вендорных шрифтов
 $ gulp favicons             # Генерация favicons
+$ gulp sprite               # Генерация спрайта
+$ gulp sprite:copy          # Копирование спрайта в assets/images
 ```
 
 ## Пакеты Gulp
@@ -322,4 +375,11 @@ $ npm i --save-dev imagemin-jpeg-recompress
 https://github.com/imagemin/imagemin-pngquant
 ```
 $ npm i --save-dev imagemin-pngquant
+```
+
+### gulp.spritesmith
+Генератор CSS-спрайта
+https://github.com/twolfson/gulp.spritesmith
+```
+$ npm i --save-dev gulp.spritesmith
 ```
