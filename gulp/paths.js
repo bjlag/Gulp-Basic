@@ -31,9 +31,8 @@ const paths = {
 
     js: {
         code: [
-            './src/js/_glob_vars.js',
-            './src/js/**/*.js',
-            './src/js/_main.js'
+            './src/js/_main.js',
+            './src/js/**/*.js'
         ],
         dist: './dist/js',
         src: './src/assets/js',

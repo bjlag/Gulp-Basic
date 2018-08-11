@@ -1,3 +1,7 @@
+'use strict';
+
+var app = {};
+
 $( function () {
     console.log( 'in main.js' );
 
