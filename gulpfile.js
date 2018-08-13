@@ -56,7 +56,6 @@ gulp.task( 'build',
         gulp.series( tasks.setDevNodeEnv ),
         gulp.parallel(
             tasks.html,
-            tasks.fonts,
             tasks.cssMain,
             tasks.cssVendor,
             tasks.jsMain,

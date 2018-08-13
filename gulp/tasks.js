@@ -70,12 +70,8 @@ tasks.html = function() {
  * Сборка шрифтов
  */
 tasks.fonts = function() {
-    let src = paths.fonts.ready,
-        dist = ( isProduction() ? paths.fonts.dist : paths.fonts.src );
-
-    if ( !isProduction() ) {
-        src = paths.fonts.vendor;
-    }
+    let src = paths.fonts.src + '/**/*',
+        dist = paths.fonts.dist;
 
     return gulp.src( src )
         .pipe( plugins.plumber() )

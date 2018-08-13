@@ -12,12 +12,8 @@ const paths = {
     },
 
     fonts: {
-        ready: './src/assets/fonts/**/*',
         dist: './dist/fonts',
-        src: './src/assets/fonts',
-        vendor: [
-            './node_modules/@fortawesome/fontawesome-free/webfonts/**/*'
-        ]
+        src: './src/assets/fonts'
     },
 
     css: {
